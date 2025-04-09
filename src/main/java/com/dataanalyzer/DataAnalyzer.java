@@ -94,226 +94,281 @@ public class DataAnalyzer {
     }
 
 
-    private void loadData(Scanner scanner) {
-        System.out.print("Digite o caminho para o arquivo CSV: ");
-        String path = scanner.nextLine();
-
-        File file = new File(path);
-        if (!file.exists()) {
-            System.out.println("Arquivo não encontrado: " + path);
-            return;
-        }
-
-        System.out.print("O arquivo tem cabeçalho? (s/n): ");
-        boolean hasHeader = scanner.nextLine().toLowerCase().startsWith("s");
-
-        System.out.print("Delimitador (padrão ','): ");
-        String delimiter = scanner.nextLine();
-        if (delimiter.isEmpty()) {
-            delimiter = ",";
-        }
-
-        try {
-            // Carrega o CSV com as opções especificadas
-            dataFrame = spark.read()
-                    .option("header", hasHeader)
-                    .option("delimiter", delimiter)
-                    .option("inferSchema", "true")
-                    .csv(path);
-
-            System.out.println("Dados carregados com sucesso!");
-            System.out.println("Número de linhas: " + dataFrame.count());
-            System.out.println("Número de colunas: " + dataFrame.columns().length);
-        } catch (Exception e) {
-            System.out.println("Erro ao carregar os dados: " + e.getMessage());
-        }
+   private void loadData(Scanner scanner) {
+    System.out.print("Digite o caminho para o arquivo CSV (ou 'example' para usar o arquivo de exemplo): ");
+    String path = scanner.nextLine();
+    
+    if (path.equalsIgnoreCase("example")) {
+        path = "src/main/resources/dados_vendas.csv";
+        System.out.println("Usando o arquivo de exemplo: " + path);
     }
-
-
-    private void showSchema() {
-        if (checkDataFrameLoaded()) {
-            System.out.println("Schema do DataFrame:");
-            dataFrame.printSchema();
-        }
+    
+    File file = new File(path);
+    if (!file.exists()) {
+        System.out.println("Arquivo não encontrado: " + path);
+        return;
     }
-
-
-    private void showSample() {
-        if (checkDataFrameLoaded()) {
-            System.out.println("Amostra de dados (20 primeiras linhas):");
-            dataFrame.show(20, false);
-        }
+    
+    System.out.print("O arquivo tem cabeçalho? (s/n): ");
+    boolean hasHeader = scanner.nextLine().toLowerCase().startsWith("s");
+    
+    System.out.print("Delimitador (padrão ','): ");
+    String delimiter = scanner.nextLine();
+    if (delimiter.isEmpty()) {
+        delimiter = ",";
     }
-
-
-    private void showStats() {
-        if (checkDataFrameLoaded()) {
-            System.out.println("Estatísticas descritivas:");
-            dataFrame.describe().show();
-
-            // Mostra contagem de valores nulos por coluna
-            System.out.println("Contagem de valores nulos por coluna:");
-            for (String col : dataFrame.columns()) {
-                long nullCount = dataFrame.filter(col(col).isNull()).count();
-                System.out.println(col + ": " + nullCount);
-            }
+    
+    try {
+        System.out.println("Carregando dados...");
+        ProgressBar progressBar = new ProgressBar();
+        
+        for (int i = 0; i <= 20; i++) {
+            progressBar.update(i / 20.0, "Inicializando...");
+            Thread.sleep(50); 
         }
+        
+        Dataset<Row> tempDF = spark.read()
+                .option("header", hasHeader)
+                .option("delimiter", delimiter)
+                .option("inferSchema", "true")
+                .csv(path);
+        
+        for (int i = 21; i <= 80; i++) {
+            progressBar.update(i / 100.0, "Processando schema...");
+            Thread.sleep(20); 
+        }
+        
+        tempDF.cache();
+        
+        long rowCount = tempDF.count();
+        
+        for (int i = 81; i <= 100; i++) {
+            progressBar.update(i / 100.0, "Finalizando...");
+            Thread.sleep(10); 
+        }
+        
+        progressBar.complete();
+        
+        dataFrame = tempDF;
+        
+        System.out.println("Dados carregados com sucesso!");
+        System.out.println("Número de linhas: " + rowCount);
+        System.out.println("Número de colunas: " + dataFrame.columns().length);
+    } catch (Exception e) {
+        System.out.println("Erro ao carregar os dados: " + e.getMessage());
     }
+}
 
-
-    private void filterData(Scanner scanner) {
-        if (!checkDataFrameLoaded()) return;
-
-        System.out.println("Colunas disponíveis: " + String.join(", ", dataFrame.columns()));
-
-        System.out.print("Digite o nome da coluna para filtrar: ");
-        String column = scanner.nextLine();
-
-        if (!Arrays.asList(dataFrame.columns()).contains(column)) {
-            System.out.println("Coluna não encontrada!");
-            return;
+private void filterData(Scanner scanner) {
+    if (!checkDataFrameLoaded()) return;
+    
+    System.out.println("Colunas disponíveis: " + String.join(", ", dataFrame.columns()));
+    
+    System.out.print("Digite o nome da coluna para filtrar: ");
+    String column = scanner.nextLine();
+    
+    if (!Arrays.asList(dataFrame.columns()).contains(column)) {
+        System.out.println("Coluna não encontrada!");
+        return;
+    }
+    
+    System.out.print("Digite o operador (=, >, <, >=, <=, !=): ");
+    String operator = scanner.nextLine();
+    
+    System.out.print("Digite o valor: ");
+    String value = scanner.nextLine();
+    
+    try {
+        System.out.println("Aplicando filtro...");
+        ProgressBar progressBar = new ProgressBar();
+        
+        for (int i = 0; i <= 50; i++) {
+            progressBar.update(i / 100.0, "Preparando filtro...");
+            Thread.sleep(10);
         }
+        
+        Dataset<Row> filteredDF = null;
+        switch (operator) {
+            case "=":
+                filteredDF = dataFrame.filter(col(column).equalTo(value));
+                break;
+            case ">":
+                filteredDF = dataFrame.filter(col(column).gt(value));
+                break;
+            case "<":
+                filteredDF = dataFrame.filter(col(column).lt(value));
+                break;
+            case ">=":
+                filteredDF = dataFrame.filter(col(column).geq(value));
+                break;
+            case "<=":
+                filteredDF = dataFrame.filter(col(column).leq(value));
+                break;
+            case "!=":
+                filteredDF = dataFrame.filter(col(column).notEqual(value));
+                break;
+            default:
+                progressBar.complete("Operador inválido!");
+                return;
+        }
+        
+        for (int i = 51; i <= 90; i++) {
+            progressBar.update(i / 100.0, "Executando filtro...");
+            Thread.sleep(10);
+        }
+        
+        long resultCount = filteredDF.count();
+        
+        for (int i = 91; i <= 100; i++) {
+            progressBar.update(i / 100.0, "Finalizando...");
+            Thread.sleep(5);
+        }
+        
+        progressBar.complete();
+        
+        dataFrame = filteredDF;
+        
+        System.out.println("Filtro aplicado! Número de linhas após filtro: " + resultCount);
+    } catch (Exception e) {
+        System.out.println("Erro ao aplicar filtro: " + e.getMessage());
+    }
+}
 
-        System.out.print("Digite o operador (=, >, <, >=, <=, !=): ");
-        String operator = scanner.nextLine();
-
-        System.out.print("Digite o valor: ");
-        String value = scanner.nextLine();
-
-        try {
-            switch (operator) {
-                case "=":
-                    dataFrame = dataFrame.filter(col(column).equalTo(value));
+private void aggregateData(Scanner scanner) {
+    if (!checkDataFrameLoaded()) return;
+    
+    System.out.println("Colunas disponíveis: " + String.join(", ", dataFrame.columns()));
+    
+    System.out.print("Digite a coluna para agrupar (deixe em branco para não agrupar): ");
+    String groupByColumn = scanner.nextLine();
+    
+    System.out.print("Digite a coluna para agregar: ");
+    String aggregateColumn = scanner.nextLine();
+    
+    if (!Arrays.asList(dataFrame.columns()).contains(aggregateColumn)) {
+        System.out.println("Coluna para agregação não encontrada!");
+        return;
+    }
+    
+    if (!groupByColumn.isEmpty() && !Arrays.asList(dataFrame.columns()).contains(groupByColumn)) {
+        System.out.println("Coluna para agrupamento não encontrada!");
+        return;
+    }
+    
+    System.out.println("Funções de agregação disponíveis:");
+    System.out.println("1. Média (avg)");
+    System.out.println("2. Soma (sum)");
+    System.out.println("3. Mínimo (min)");
+    System.out.println("4. Máximo (max)");
+    System.out.println("5. Contagem (count)");
+    
+    System.out.print("Digite o número da função: ");
+    int functionChoice = scanner.nextInt();
+    scanner.nextLine(); 
+    
+    try {
+        System.out.println("Executando agregação...");
+        ProgressBar progressBar = new ProgressBar();
+        
+        for (int i = 0; i <= 40; i++) {
+            progressBar.update(i / 100.0, "Preparando dados...");
+            Thread.sleep(15);
+        }
+        
+        Dataset<Row> resultDF = null;
+        String operationName = "";
+        
+        if (groupByColumn.isEmpty()) {
+            switch (functionChoice) {
+                case 1:
+                    resultDF = dataFrame.agg(avg(aggregateColumn).alias("avg_" + aggregateColumn));
+                    operationName = "Calculando média";
                     break;
-                case ">":
-                    dataFrame = dataFrame.filter(col(column).gt(value));
+                case 2:
+                    resultDF = dataFrame.agg(sum(aggregateColumn).alias("sum_" + aggregateColumn));
+                    operationName = "Calculando soma";
                     break;
-                case "<":
-                    dataFrame = dataFrame.filter(col(column).lt(value));
+                case 3:
+                    resultDF = dataFrame.agg(min(aggregateColumn).alias("min_" + aggregateColumn));
+                    operationName = "Encontrando mínimo";
                     break;
-                case ">=":
-                    dataFrame = dataFrame.filter(col(column).geq(value));
+                case 4:
+                    resultDF = dataFrame.agg(max(aggregateColumn).alias("max_" + aggregateColumn));
+                    operationName = "Encontrando máximo";
                     break;
-                case "<=":
-                    dataFrame = dataFrame.filter(col(column).leq(value));
-                    break;
-                case "!=":
-                    dataFrame = dataFrame.filter(col(column).notEqual(value));
+                case 5:
+                    resultDF = dataFrame.agg(count(aggregateColumn).alias("count_" + aggregateColumn));
+                    operationName = "Contando registros";
                     break;
                 default:
-                    System.out.println("Operador inválido!");
+                    progressBar.complete("Função inválida!");
                     return;
             }
-
-            System.out.println("Filtro aplicado! Número de linhas após filtro: " + dataFrame.count());
-        } catch (Exception e) {
-            System.out.println("Erro ao aplicar filtro: " + e.getMessage());
-        }
-    }
-
-
-    private void aggregateData(Scanner scanner) {
-        if (!checkDataFrameLoaded()) return;
-
-        System.out.println("Colunas disponíveis: " + String.join(", ", dataFrame.columns()));
-
-        System.out.print("Digite a coluna para agrupar (deixe em branco para não agrupar): ");
-        String groupByColumn = scanner.nextLine();
-
-        System.out.print("Digite a coluna para agregar: ");
-        String aggregateColumn = scanner.nextLine();
-
-        if (!Arrays.asList(dataFrame.columns()).contains(aggregateColumn)) {
-            System.out.println("Coluna para agregação não encontrada!");
-            return;
-        }
-
-        if (!groupByColumn.isEmpty() && !Arrays.asList(dataFrame.columns()).contains(groupByColumn)) {
-            System.out.println("Coluna para agrupamento não encontrada!");
-            return;
-        }
-
-        System.out.println("Funções de agregação disponíveis:");
-        System.out.println("1. Média (avg)");
-        System.out.println("2. Soma (sum)");
-        System.out.println("3. Mínimo (min)");
-        System.out.println("4. Máximo (max)");
-        System.out.println("5. Contagem (count)");
-
-        System.out.print("Digite o número da função: ");
-        int functionChoice = scanner.nextInt();
-        scanner.nextLine(); // Limpa o buffer
-
-        try {
-            Dataset<Row> resultDF;
-
-            if (groupByColumn.isEmpty()) {
-                switch (functionChoice) {
-                    case 1:
-                        resultDF = dataFrame.agg(avg(aggregateColumn).alias("avg_" + aggregateColumn));
-                        break;
-                    case 2:
-                        resultDF = dataFrame.agg(sum(aggregateColumn).alias("sum_" + aggregateColumn));
-                        break;
-                    case 3:
-                        resultDF = dataFrame.agg(min(aggregateColumn).alias("min_" + aggregateColumn));
-                        break;
-                    case 4:
-                        resultDF = dataFrame.agg(max(aggregateColumn).alias("max_" + aggregateColumn));
-                        break;
-                    case 5:
-                        resultDF = dataFrame.agg(count(aggregateColumn).alias("count_" + aggregateColumn));
-                        break;
-                    default:
-                        System.out.println("Função inválida!");
-                        return;
-                }
-            } else {
-                switch (functionChoice) {
-                    case 1:
-                        resultDF = dataFrame.groupBy(groupByColumn)
-                                .agg(avg(aggregateColumn).alias("avg_" + aggregateColumn))
-                                .orderBy(groupByColumn);
-                        break;
-                    case 2:
-                        resultDF = dataFrame.groupBy(groupByColumn)
-                                .agg(sum(aggregateColumn).alias("sum_" + aggregateColumn))
-                                .orderBy(groupByColumn);
-                        break;
-                    case 3:
-                        resultDF = dataFrame.groupBy(groupByColumn)
-                                .agg(min(aggregateColumn).alias("min_" + aggregateColumn))
-                                .orderBy(groupByColumn);
-                        break;
-                    case 4:
-                        resultDF = dataFrame.groupBy(groupByColumn)
-                                .agg(max(aggregateColumn).alias("max_" + aggregateColumn))
-                                .orderBy(groupByColumn);
-                        break;
-                    case 5:
-                        resultDF = dataFrame.groupBy(groupByColumn)
-                                .agg(count(aggregateColumn).alias("count_" + aggregateColumn))
-                                .orderBy(groupByColumn);
-                        break;
-                    default:
-                        System.out.println("Função inválida!");
-                        return;
-                }
+        } else {
+            switch (functionChoice) {
+                case 1:
+                    resultDF = dataFrame.groupBy(groupByColumn)
+                            .agg(avg(aggregateColumn).alias("avg_" + aggregateColumn))
+                            .orderBy(groupByColumn);
+                    operationName = "Calculando média por grupo";
+                    break;
+                case 2:
+                    resultDF = dataFrame.groupBy(groupByColumn)
+                            .agg(sum(aggregateColumn).alias("sum_" + aggregateColumn))
+                            .orderBy(groupByColumn);
+                    operationName = "Calculando soma por grupo";
+                    break;
+                case 3:
+                    resultDF = dataFrame.groupBy(groupByColumn)
+                            .agg(min(aggregateColumn).alias("min_" + aggregateColumn))
+                            .orderBy(groupByColumn);
+                    operationName = "Encontrando mínimo por grupo";
+                    break;
+                case 4:
+                    resultDF = dataFrame.groupBy(groupByColumn)
+                            .agg(max(aggregateColumn).alias("max_" + aggregateColumn))
+                            .orderBy(groupByColumn);
+                    operationName = "Encontrando máximo por grupo";
+                    break;
+                case 5:
+                    resultDF = dataFrame.groupBy(groupByColumn)
+                            .agg(count(aggregateColumn).alias("count_" + aggregateColumn))
+                            .orderBy(groupByColumn);
+                    operationName = "Contando registros por grupo";
+                    break;
+                default:
+                    progressBar.complete("Função inválida!");
+                    return;
             }
-
-            System.out.println("Resultado da agregação:");
-            resultDF.show(20, false);
-
-            System.out.print("Deseja usar este resultado como novo DataFrame? (s/n): ");
-            if (scanner.nextLine().toLowerCase().startsWith("s")) {
-                dataFrame = resultDF;
-                System.out.println("DataFrame atualizado!");
-            }
-        } catch (Exception e) {
-            System.out.println("Erro ao aplicar agregação: " + e.getMessage());
         }
+        
+        for (int i = 41; i <= 80; i++) {
+            progressBar.update(i / 100.0, operationName + "...");
+            Thread.sleep(10);
+        }
+        
+        resultDF.cache();
+        resultDF.count(); // Força a execução
+        
+        for (int i = 81; i <= 100; i++) {
+            progressBar.update(i / 100.0, "Finalizando...");
+            Thread.sleep(5);
+        }
+        
+        progressBar.complete();
+        
+        System.out.println("Resultado da agregação:");
+        resultDF.show(20, false);
+        
+        System.out.print("Deseja usar este resultado como novo DataFrame? (s/n): ");
+        if (scanner.nextLine().toLowerCase().startsWith("s")) {
+            dataFrame = resultDF;
+            System.out.println("DataFrame atualizado!");
+        }
+    } catch (Exception e) {
+        System.out.println("Erro ao aplicar agregação: " + e.getMessage());
     }
-
+}
 
     private void transformData(Scanner scanner) {
         if (!checkDataFrameLoaded()) return;
@@ -612,9 +667,7 @@ public class DataAnalyzer {
         }
     }
 
-    /**
-     * Verifica se um DataFrame foi carregado
-     */
+    
     private boolean checkDataFrameLoaded() {
         if (dataFrame == null) {
             System.out.println("Nenhum dado carregado. Por favor, carregue um arquivo primeiro.");
@@ -623,9 +676,7 @@ public class DataAnalyzer {
         return true;
     }
 
-    /**
-     * Encerra a sessão Spark
-     */
+   
     private void shutdown() {
         if (spark != null) {
             spark.stop();
