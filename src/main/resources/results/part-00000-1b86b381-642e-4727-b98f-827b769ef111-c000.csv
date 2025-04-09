@@ -1,0 +1,51 @@
+ID,Data,Produto,Categoria,Preco,Quantidade,ClienteID,Regiao,Vendedor,Desconto
+1,2023-01-05,Laptop Dell XPS,Eletrônicos,5499.9,1,C001,Sul,Maria Silva,0.0
+2,2023-01-07,Mouse Gamer,Periféricos,129.9,2,C002,Sudeste,João Oliveira,0.05
+3,2023-01-12,Teclado Mecânico,Periféricos,349.9,1,C003,Norte,Pedro Santos,0.1
+4,2023-01-15,"Monitor 27\"",Eletrônicos,1299.9,1,C001,Sul,Maria Silva,0.07
+5,2023-01-18,Notebook Lenovo,Eletrônicos,3999.9,1,C004,Nordeste,Ana Souza,0.0
+6,2023-01-22,Headset Gamer,Áudio,279.9,2,C005,Sul,Carlos Ferreira,0.15
+7,2023-01-25,SSD 500GB,Armazenamento,399.9,3,C002,Sudeste,João Oliveira,0.0
+8,2023-01-28,Webcam HD,Periféricos,199.9,1,C006,Centro-Oeste,Mariana Costa,0.0
+9,2023-02-01,Smartphone Samsung,Eletrônicos,2499.9,1,C007,Norte,Pedro Santos,0.1
+10,2023-02-03,Tablet Apple,Eletrônicos,3899.9,1,C008,Sudeste,Ana Souza,0.05
+11,2023-02-07,Fone Bluetooth,Áudio,159.9,2,C009,Nordeste,Carlos Ferreira,0.0
+12,2023-02-10,HD Externo 1TB,Armazenamento,349.9,1,C001,Sul,Maria Silva,0.0
+13,2023-02-14,Impressora Laser,Periféricos,1199.9,1,C010,Centro-Oeste,João Oliveira,0.1
+14,2023-02-17,Carregador USB-C,Acessórios,89.9,3,C003,Norte,Mariana Costa,0.0
+15,2023-02-21,Mouse sem fio,Periféricos,79.9,2,C011,Sudeste,Pedro Santos,0.05
+16,2023-02-24,Teclado sem fio,Periféricos,129.9,1,C004,Nordeste,Ana Souza,0.0
+17,2023-02-28,Caixa de Som,Áudio,159.9,1,C012,Sul,Carlos Ferreira,0.05
+18,2023-03-03,Laptop Acer,Eletrônicos,3499.9,1,C013,Centro-Oeste,Maria Silva,0.07
+19,2023-03-07,Smartphone Xiaomi,Eletrônicos,1899.9,1,C014,Sudeste,João Oliveira,0.0
+20,2023-03-10,Memória RAM 8GB,Componentes,279.9,2,C005,Norte,Pedro Santos,0.0
+21,2023-03-14,Placa de Vídeo,Componentes,1999.9,1,C015,Nordeste,Ana Souza,0.1
+22,2023-03-17,Cooler CPU,Componentes,89.9,2,C016,Sul,Carlos Ferreira,0.0
+23,2023-03-21,Câmera DSLR,Fotografia,2499.9,1,C017,Centro-Oeste,Mariana Costa,0.15
+24,2023-03-24,Fone de Ouvido,Áudio,199.9,1,C018,Sudeste,Maria Silva,0.0
+25,2023-03-28,Monitor Ultrawide,Eletrônicos,2299.9,1,C019,Norte,João Oliveira,0.1
+26,2023-04-01,Teclado Gamer RGB,Periféricos,299.9,1,C020,Nordeste,Pedro Santos,0.0
+27,2023-04-05,Mouse Ergonômico,Periféricos,159.9,1,C001,Sul,Ana Souza,0.05
+28,2023-04-08,Notebook HP,Eletrônicos,4199.9,1,C021,Centro-Oeste,Carlos Ferreira,0.07
+29,2023-04-12,SSD 1TB,Armazenamento,699.9,1,C022,Sudeste,Mariana Costa,0.0
+30,2023-04-15,Pendrive 64GB,Armazenamento,59.9,3,C003,Norte,Maria Silva,0.0
+31,2023-04-19,Smartphone Motorola,Eletrônicos,1699.9,1,C023,Nordeste,João Oliveira,0.1
+32,2023-04-22,HD 2TB,Armazenamento,399.9,1,C024,Sul,Pedro Santos,0.0
+33,2023-04-26,Cadeira Gamer,Móveis,899.9,1,C025,Centro-Oeste,Ana Souza,0.05
+34,2023-04-29,Gabinete Gamer,Componentes,349.9,1,C026,Sudeste,Carlos Ferreira,0.0
+35,2023-05-03,Fonte 650W,Componentes,399.9,1,C027,Norte,Mariana Costa,0.0
+36,2023-05-06,Adaptador WiFi,Redes,129.9,1,C028,Nordeste,Maria Silva,0.05
+37,2023-05-10,Carregador Wireless,Acessórios,149.9,1,C029,Sul,João Oliveira,0.0
+38,2023-05-13,Smartwatch,Wearables,899.9,1,C030,Centro-Oeste,Pedro Santos,0.1
+39,2023-05-17,Hub USB,Acessórios,99.9,2,C006,Sudeste,Ana Souza,0.0
+40,2023-05-20,Suporte Monitor,Acessórios,119.9,1,C031,Norte,Carlos Ferreira,0.0
+41,2023-05-24,Processador AMD,Componentes,1299.9,1,C032,Nordeste,Mariana Costa,0.07
+42,2023-05-27,Cabo HDMI,Acessórios,29.9,3,C033,Sul,Maria Silva,0.0
+43,2023-05-31,Roteador WiFi,Redes,299.9,1,C034,Centro-Oeste,João Oliveira,0.05
+44,2023-06-03,Placa-mãe,Componentes,699.9,1,C035,Sudeste,Pedro Santos,0.0
+45,2023-06-07,Projetor,Eletrônicos,2999.9,1,C036,Norte,Ana Souza,0.1
+46,2023-06-10,Pasta Térmica,Componentes,19.9,2,C037,Nordeste,Carlos Ferreira,0.0
+47,2023-06-14,Tablet Samsung,Eletrônicos,1999.9,1,C038,Sul,Mariana Costa,0.05
+48,2023-06-17,Desktop Dell,Eletrônicos,5999.9,1,C039,Centro-Oeste,Maria Silva,0.15
+49,2023-06-21,Switch 8 portas,Redes,149.9,1,C040,Sudeste,João Oliveira,0.0
+50,2023-06-24,Mousepad XL,Acessórios,59.9,2,C041,Norte,Pedro Santos,0.0

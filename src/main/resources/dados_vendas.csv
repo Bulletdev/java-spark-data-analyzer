@@ -1,0 +1,51 @@
+ID,Data,Produto,Categoria,Preco,Quantidade,ClienteID,Regiao,Vendedor,Desconto
+1,2023-01-05,Laptop Dell XPS,Eletrônicos,5499.90,1,C001,Sul,Maria Silva,0.00
+2,2023-01-07,Mouse Gamer,Periféricos,129.90,2,C002,Sudeste,João Oliveira,0.05
+3,2023-01-12,Teclado Mecânico,Periféricos,349.90,1,C003,Norte,Pedro Santos,0.10
+4,2023-01-15,Monitor 27",Eletrônicos,1299.90,1,C001,Sul,Maria Silva,0.07
+5,2023-01-18,Notebook Lenovo,Eletrônicos,3999.90,1,C004,Nordeste,Ana Souza,0.00
+6,2023-01-22,Headset Gamer,Áudio,279.90,2,C005,Sul,Carlos Ferreira,0.15
+7,2023-01-25,SSD 500GB,Armazenamento,399.90,3,C002,Sudeste,João Oliveira,0.00
+8,2023-01-28,Webcam HD,Periféricos,199.90,1,C006,Centro-Oeste,Mariana Costa,0.00
+9,2023-02-01,Smartphone Samsung,Eletrônicos,2499.90,1,C007,Norte,Pedro Santos,0.10
+10,2023-02-03,Tablet Apple,Eletrônicos,3899.90,1,C008,Sudeste,Ana Souza,0.05
+11,2023-02-07,Fone Bluetooth,Áudio,159.90,2,C009,Nordeste,Carlos Ferreira,0.00
+12,2023-02-10,HD Externo 1TB,Armazenamento,349.90,1,C001,Sul,Maria Silva,0.00
+13,2023-02-14,Impressora Laser,Periféricos,1199.90,1,C010,Centro-Oeste,João Oliveira,0.10
+14,2023-02-17,Carregador USB-C,Acessórios,89.90,3,C003,Norte,Mariana Costa,0.00
+15,2023-02-21,Mouse sem fio,Periféricos,79.90,2,C011,Sudeste,Pedro Santos,0.05
+16,2023-02-24,Teclado sem fio,Periféricos,129.90,1,C004,Nordeste,Ana Souza,0.00
+17,2023-02-28,Caixa de Som,Áudio,159.90,1,C012,Sul,Carlos Ferreira,0.05
+18,2023-03-03,Laptop Acer,Eletrônicos,3499.90,1,C013,Centro-Oeste,Maria Silva,0.07
+19,2023-03-07,Smartphone Xiaomi,Eletrônicos,1899.90,1,C014,Sudeste,João Oliveira,0.00
+20,2023-03-10,Memória RAM 8GB,Componentes,279.90,2,C005,Norte,Pedro Santos,0.00
+21,2023-03-14,Placa de Vídeo,Componentes,1999.90,1,C015,Nordeste,Ana Souza,0.10
+22,2023-03-17,Cooler CPU,Componentes,89.90,2,C016,Sul,Carlos Ferreira,0.00
+23,2023-03-21,Câmera DSLR,Fotografia,2499.90,1,C017,Centro-Oeste,Mariana Costa,0.15
+24,2023-03-24,Fone de Ouvido,Áudio,199.90,1,C018,Sudeste,Maria Silva,0.00
+25,2023-03-28,Monitor Ultrawide,Eletrônicos,2299.90,1,C019,Norte,João Oliveira,0.10
+26,2023-04-01,Teclado Gamer RGB,Periféricos,299.90,1,C020,Nordeste,Pedro Santos,0.00
+27,2023-04-05,Mouse Ergonômico,Periféricos,159.90,1,C001,Sul,Ana Souza,0.05
+28,2023-04-08,Notebook HP,Eletrônicos,4199.90,1,C021,Centro-Oeste,Carlos Ferreira,0.07
+29,2023-04-12,SSD 1TB,Armazenamento,699.90,1,C022,Sudeste,Mariana Costa,0.00
+30,2023-04-15,Pendrive 64GB,Armazenamento,59.90,3,C003,Norte,Maria Silva,0.00
+31,2023-04-19,Smartphone Motorola,Eletrônicos,1699.90,1,C023,Nordeste,João Oliveira,0.10
+32,2023-04-22,HD 2TB,Armazenamento,399.90,1,C024,Sul,Pedro Santos,0.00
+33,2023-04-26,Cadeira Gamer,Móveis,899.90,1,C025,Centro-Oeste,Ana Souza,0.05
+34,2023-04-29,Gabinete Gamer,Componentes,349.90,1,C026,Sudeste,Carlos Ferreira,0.00
+35,2023-05-03,Fonte 650W,Componentes,399.90,1,C027,Norte,Mariana Costa,0.00
+36,2023-05-06,Adaptador WiFi,Redes,129.90,1,C028,Nordeste,Maria Silva,0.05
+37,2023-05-10,Carregador Wireless,Acessórios,149.90,1,C029,Sul,João Oliveira,0.00
+38,2023-05-13,Smartwatch,Wearables,899.90,1,C030,Centro-Oeste,Pedro Santos,0.10
+39,2023-05-17,Hub USB,Acessórios,99.90,2,C006,Sudeste,Ana Souza,0.00
+40,2023-05-20,Suporte Monitor,Acessórios,119.90,1,C031,Norte,Carlos Ferreira,0.00
+41,2023-05-24,Processador AMD,Componentes,1299.90,1,C032,Nordeste,Mariana Costa,0.07
+42,2023-05-27,Cabo HDMI,Acessórios,29.90,3,C033,Sul,Maria Silva,0.00
+43,2023-05-31,Roteador WiFi,Redes,299.90,1,C034,Centro-Oeste,João Oliveira,0.05
+44,2023-06-03,Placa-mãe,Componentes,699.90,1,C035,Sudeste,Pedro Santos,0.00
+45,2023-06-07,Projetor,Eletrônicos,2999.90,1,C036,Norte,Ana Souza,0.10
+46,2023-06-10,Pasta Térmica,Componentes,19.90,2,C037,Nordeste,Carlos Ferreira,0.00
+47,2023-06-14,Tablet Samsung,Eletrônicos,1999.90,1,C038,Sul,Mariana Costa,0.05
+48,2023-06-17,Desktop Dell,Eletrônicos,5999.90,1,C039,Centro-Oeste,Maria Silva,0.15
+49,2023-06-21,Switch 8 portas,Redes,149.90,1,C040,Sudeste,João Oliveira,0.00
+50,2023-06-24,Mousepad XL,Acessórios,59.90,2,C041,Norte,Pedro Santos,0.00
