@@ -12,7 +12,7 @@
 
 ---
 
-## ✨ Principais Funcionalidades
+## ✨ Principais Funcionalidades 
 
 - 📊 **Carregamento intuitivo de dados** - Suporte para CSV com diversas opções de configuração
 - 🔍 **Visualização interativa** - Exibição de schemas, amostras e estatísticas descritivas
