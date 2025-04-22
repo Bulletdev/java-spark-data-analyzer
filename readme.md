@@ -90,22 +90,6 @@ java --add-opens=java.base/java.nio=ALL-UNNAMED \
 -jar target/java-spark-data-analyzer-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
-## 📁 Estrutura do Projeto
-
-```
-java-spark-data-analyzer/
-├── src/
-│   └── main/
-│       ├── java/
-│       │   └── com/
-│       │       └── dataanalyzer/
-│       │           └── DataAnalyzer.java
-│       └── resources/
-│           └── dados_vendas.csv
-├── pom.xml
-└── README.md
-```
-
 ## ❓ Solução de Problemas
 
 ### Windows e Hadoop
