@@ -12,7 +12,7 @@
 
 ---
 
-## ✨ Principais Funcionalidades 
+## ✨ Principais Funcionalidades
 
 - 📊 **Carregamento intuitivo de dados** - Suporte para CSV com diversas opções de configuração
 - 🔍 **Visualização interativa** - Exibição de schemas, amostras e estatísticas descritivas
@@ -21,7 +21,6 @@
 - 📈 **Agregações flexíveis** - Funções como média, soma, mínimo, máximo e contagem
 - ⚙️ **Tratamento de dados** - Remoção eficiente de duplicatas e valores nulos
 - 💾 **Múltiplos formatos de exportação** - Salvamento em CSV, Parquet e JSON
-- ⏳ **Barras de progresso visuais** - Feedback em tempo real durante operações longas
 
 ## 📋 Requisitos
 
@@ -100,29 +99,11 @@ java-spark-data-analyzer/
 │       ├── java/
 │       │   └── com/
 │       │       └── dataanalyzer/
-│       │           ├── DataAnalyzer.java
-│       │           └── ProgressBar.java
+│       │           └── DataAnalyzer.java
 │       └── resources/
 │           └── dados_vendas.csv
 ├── pom.xml
 └── README.md
-```
-
-## 🌟 Feedback Visual com Barras de Progresso
-
-O aplicativo implementa barras de progresso visuais no console para melhorar a experiência do usuário durante operações que podem demorar, como:
-
-- Carregamento de arquivos CSV grandes
-- Filtragem de dados com condições complexas
-- Cálculo de estatísticas descritivas
-- Operações de agregação por grupos
-- Exportação de resultados em diferentes formatos
-
-Exemplo de barra de progresso durante o carregamento de dados:
-```
-Carregando dados...
-[██████████████████████████████████████████████████] 100% Finalizando...
-Dados carregados com sucesso!
 ```
 
 ## ❓ Solução de Problemas
@@ -167,33 +148,18 @@ Ao iniciar o aplicativo, você verá um menu interativo:
     - Digite o caminho para o CSV ou use "example" para o arquivo de exemplo
     - Confirme se o arquivo tem cabeçalho (s/n)
     - Especifique o delimitador (geralmente vírgula)
-    - Uma barra de progresso irá mostrar o status do carregamento
 
 2. **Explore os dados**:
     - Opção 2: Ver a estrutura (schema) dos dados
     - Opção 3: Ver uma amostra dos dados
-    - Opção 4: Ver estatísticas descritivas com feedback visual do progresso
+    - Opção 4: Ver estatísticas descritivas
 
 3. **Analise e transforme os dados**:
-    - Opção 5: Filtrar registros com barra de progresso durante o processamento
-    - Opção 6: Agregar dados (ex: soma de vendas por região) com feedback visual
+    - Opção 5: Filtrar registros
+    - Opção 6: Agregar dados (ex: soma de vendas por região)
     - Opção 7: Transformar dados (criar colunas, renomear, etc.)
 
-4. **Salve os resultados** usando a opção 8 com barra de progresso durante a exportação
-
-## 🧩 Personalizando as Barras de Progresso
-
-As barras de progresso podem ser personalizadas modificando os parâmetros do construtor da classe `ProgressBar`:
-
-```java
-ProgressBar progressBar = new ProgressBar();
-
-ProgressBar wideBar = new ProgressBar(80, '█', '░', true);
-
-ProgressBar customBar = new ProgressBar(50, '#', '-', true);
-
-ProgressBar simpleBar = new ProgressBar(50, '█', '░', false);
-```
+4. **Salve os resultados** usando a opção 8
 
 ## 🤝 Contribuições
 
