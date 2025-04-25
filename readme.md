@@ -9,7 +9,7 @@
 **Um aplicativo Java de análise de dados com Apache Spark que compete diretamente com soluções em Python.**
 
 </div>
-
+ 
 ---
 
 ## ✨ Principais Funcionalidades
