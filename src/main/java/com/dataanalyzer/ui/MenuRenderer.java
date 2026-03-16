@@ -14,19 +14,35 @@ public class MenuRenderer {
         System.out.println("\n=================================");
         System.out.println("       Java Data Analyzer        ");
         System.out.println("=================================");
-        System.out.println("1.  Carregar dados");
-        System.out.println("2.  Visualizar schema");
-        System.out.println("3.  Mostrar amostra de dados");
-        System.out.println("4.  Estatísticas descritivas");
-        System.out.println("5.  Filtrar dados");
-        System.out.println("6.  Agregar dados");
-        System.out.println("7.  Transformar dados");
-        System.out.println("8.  Salvar resultados");
-        System.out.println("9.  Sair");
-        System.out.println("10. SQL interativo");
-        System.out.println("11. Join entre arquivos");
-        System.out.println("12. Perfil de dados");
-        System.out.println("13. Histórico de operações");
+        System.out.println("1. Carregar dados");
+        System.out.println("2. Sair");
+        System.out.println("---------------------------------");
+        System.out.print("Escolha (1-2): ");
+    }
+
+    /**
+     * Renders the data operations menu shown after a file is loaded.
+     *
+     * @param fileName name of the currently loaded file
+     */
+    public void displayDataMenu(final String fileName) {
+        System.out.println("\n=================================");
+        System.out.println("       Java Data Analyzer        ");
+        System.out.println("  Arquivo: " + fileName);
+        System.out.println("=================================");
+        System.out.println("1.  Visualizar schema");
+        System.out.println("2.  Amostra de dados");
+        System.out.println("3.  Estatísticas descritivas");
+        System.out.println("4.  Filtrar dados");
+        System.out.println("5.  Agregar dados");
+        System.out.println("6.  Transformar dados");
+        System.out.println("7.  SQL interativo");
+        System.out.println("8.  Join com outro arquivo");
+        System.out.println("9.  Perfil de dados");
+        System.out.println("10. Histórico de operações");
+        System.out.println("11. Salvar resultados");
+        System.out.println("12. Carregar novo arquivo");
+        System.out.println("13. Sair");
         System.out.println("---------------------------------");
         System.out.print("Escolha (1-13): ");
     }

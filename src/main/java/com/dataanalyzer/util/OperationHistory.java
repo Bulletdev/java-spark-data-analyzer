@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Records the sequence of operations applied to the current DataFrame
@@ -69,5 +70,22 @@ public class OperationHistory {
      */
     public List<String> getEntries() {
         return Collections.unmodifiableList(entries);
+    }
+
+    /**
+     * Returns the details field of the most recent entry, if any.
+     *
+     * @return optional details string of the last recorded operation
+     */
+    public Optional<String> lastOperation() {
+        if (entries.isEmpty()) {
+            return Optional.empty();
+        }
+        String last = entries.get(entries.size() - 1);
+        int dash = last.indexOf('\u2014');
+        if (dash >= 0 && dash + 2 < last.length()) {
+            return Optional.of(last.substring(dash + 2).trim());
+        }
+        return Optional.of(last);
     }
 }

@@ -37,38 +37,44 @@ public class UserInterface {
     private static final Logger LOG =
         LoggerFactory.getLogger(UserInterface.class);
 
-    /** Menu option: show sample. */
-    private static final int OPT_SHOW_SAMPLE = 3;
+    /** Data menu option: show schema. */
+    private static final int DOPT_SCHEMA = 1;
 
-    /** Menu option: show stats. */
-    private static final int OPT_SHOW_STATS = 4;
+    /** Data menu option: show sample. */
+    private static final int DOPT_SAMPLE = 2;
 
-    /** Menu option: filter. */
-    private static final int OPT_FILTER = 5;
+    /** Data menu option: show stats. */
+    private static final int DOPT_STATS = 3;
 
-    /** Menu option: aggregate. */
-    private static final int OPT_AGGREGATE = 6;
+    /** Data menu option: filter. */
+    private static final int DOPT_FILTER = 4;
 
-    /** Menu option: transform. */
-    private static final int OPT_TRANSFORM = 7;
+    /** Data menu option: aggregate. */
+    private static final int DOPT_AGGREGATE = 5;
 
-    /** Menu option: export. */
-    private static final int OPT_EXPORT = 8;
+    /** Data menu option: transform. */
+    private static final int DOPT_TRANSFORM = 6;
 
-    /** Menu option: exit. */
-    private static final int OPT_EXIT = 9;
+    /** Data menu option: SQL. */
+    private static final int DOPT_SQL = 7;
 
-    /** Menu option: SQL. */
-    private static final int OPT_SQL = 10;
+    /** Data menu option: join. */
+    private static final int DOPT_JOIN = 8;
 
-    /** Menu option: join. */
-    private static final int OPT_JOIN = 11;
+    /** Data menu option: profile. */
+    private static final int DOPT_PROFILE = 9;
 
-    /** Menu option: profile. */
-    private static final int OPT_PROFILE = 12;
+    /** Data menu option: history. */
+    private static final int DOPT_HISTORY = 10;
 
-    /** Menu option: history. */
-    private static final int OPT_HISTORY = 13;
+    /** Data menu option: export. */
+    private static final int DOPT_EXPORT = 11;
+
+    /** Data menu option: load new file. */
+    private static final int DOPT_LOAD_NEW = 12;
+
+    /** Data menu option: exit. */
+    private static final int DOPT_EXIT = 13;
 
     /** Transform option: add column. */
     private static final int TOPT_ADD_COL = 3;
@@ -99,6 +105,12 @@ public class UserInterface {
 
     /** Transform option: back. */
     private static final int TOPT_BACK = 12;
+
+    /** Aggregation menu option: count. */
+    private static final int AGG_COUNT = 5;
+
+    /** Window function menu option: LEAD. */
+    private static final int WIN_LEAD = 5;
 
     /** Load format option: JSON. */
     private static final int FMT_JSON = 3;
@@ -172,53 +184,89 @@ public class UserInterface {
         while (running) {
             menu.displayMainMenu();
             int choice = readChoice();
-
             switch (choice) {
                 case 1:
                     handleLoad();
+                    if (currentDf != null) {
+                        running = runDataLoop();
+                    }
                     break;
                 case 2:
-                    handleShowSchema();
-                    break;
-                case OPT_SHOW_SAMPLE:
-                    handleShowSample();
-                    break;
-                case OPT_SHOW_STATS:
-                    handleShowStats();
-                    break;
-                case OPT_FILTER:
-                    handleFilter();
-                    break;
-                case OPT_AGGREGATE:
-                    handleAggregate();
-                    break;
-                case OPT_TRANSFORM:
-                    handleTransform();
-                    break;
-                case OPT_EXPORT:
-                    handleExport();
-                    break;
-                case OPT_EXIT:
                     running = false;
                     System.out.println("Encerrando aplicação...");
                     break;
-                case OPT_SQL:
+                default:
+                    menu.printError(
+                        "Opção inválida. Digite 1 ou 2.");
+            }
+        }
+    }
+
+    /**
+     * Runs the data-operations loop after a file is loaded.
+     *
+     * @return {@code false} if the user chose to exit the application,
+     *         {@code true} if they chose to load a new file
+     */
+    private boolean runDataLoop() {
+        String fileName = currentLoadedName();
+        while (true) {
+            menu.displayDataMenu(fileName);
+            int choice = readChoice();
+            switch (choice) {
+                case DOPT_SCHEMA:
+                    handleShowSchema();
+                    break;
+                case DOPT_SAMPLE:
+                    handleShowSample();
+                    break;
+                case DOPT_STATS:
+                    handleShowStats();
+                    break;
+                case DOPT_FILTER:
+                    handleFilter();
+                    break;
+                case DOPT_AGGREGATE:
+                    handleAggregate();
+                    break;
+                case DOPT_TRANSFORM:
+                    handleTransform();
+                    break;
+                case DOPT_SQL:
                     handleSql();
                     break;
-                case OPT_JOIN:
+                case DOPT_JOIN:
                     handleJoin();
                     break;
-                case OPT_PROFILE:
+                case DOPT_PROFILE:
                     handleProfile();
                     break;
-                case OPT_HISTORY:
+                case DOPT_HISTORY:
                     handleHistory();
                     break;
+                case DOPT_EXPORT:
+                    handleExport();
+                    break;
+                case DOPT_LOAD_NEW:
+                    currentDf = null;
+                    return true;
+                case DOPT_EXIT:
+                    System.out.println("Encerrando aplicação...");
+                    return false;
                 default:
                     menu.printError(
                         "Opção inválida. Digite um número de 1 a 13.");
             }
         }
+    }
+
+    /**
+     * Returns a short display name for the currently loaded DataFrame.
+     *
+     * @return file name label
+     */
+    private String currentLoadedName() {
+        return history.lastOperation().orElse("arquivo carregado");
     }
 
     // -------------------------------------------------------------------------
@@ -253,8 +301,9 @@ public class UserInterface {
     }
 
     private void loadCsv() {
-        String path = input.readLine(
-            "Caminho do CSV (ou 'example' para dados de exemplo): ");
+        System.out.println(
+            "Digite 'example' para carregar os dados de exemplo.");
+        String path = input.readFilePath("csv");
 
         if (path.equalsIgnoreCase("example")) {
             currentDf = loader.loadSample();
@@ -275,8 +324,7 @@ public class UserInterface {
     }
 
     private void loadParquet() {
-        String path = input.readLine(
-            "Caminho do arquivo/diretório Parquet: ");
+        String path = input.readFilePath("parquet");
         currentDf = loader.loadParquet(path);
         history.record("Carregar Parquet", path);
         System.out.println("DataFrame carregado.");
@@ -284,8 +332,7 @@ public class UserInterface {
     }
 
     private void loadJson() {
-        String path = input.readLine(
-            "Caminho do arquivo/diretório JSON: ");
+        String path = input.readFilePath("json");
         currentDf = loader.loadJson(path);
         history.record("Carregar JSON", path);
         System.out.println("DataFrame carregado.");
@@ -297,25 +344,16 @@ public class UserInterface {
     // -------------------------------------------------------------------------
 
     private void handleShowSchema() {
-        if (!checkLoaded()) {
-            return;
-        }
         menu.printSection("Schema");
         currentDf.printSchema();
     }
 
     private void handleShowSample() {
-        if (!checkLoaded()) {
-            return;
-        }
         menu.printSection("Amostra de Dados (20 linhas)");
         currentDf.show(SAMPLE_ROWS, false);
     }
 
     private void handleShowStats() {
-        if (!checkLoaded()) {
-            return;
-        }
         menu.printSection("Estatísticas Descritivas");
         System.out.println("Calculando...");
         currentDf.describe().show();
@@ -333,9 +371,6 @@ public class UserInterface {
     // -------------------------------------------------------------------------
 
     private void handleFilter() {
-        if (!checkLoaded()) {
-            return;
-        }
         menu.printColumns(currentDf.columns());
 
         String column   = input.readLine("Coluna para filtrar: ");
@@ -358,9 +393,6 @@ public class UserInterface {
     // -------------------------------------------------------------------------
 
     private void handleAggregate() {
-        if (!checkLoaded()) {
-            return;
-        }
         menu.printColumns(currentDf.columns());
 
         String groupBy = input.readLine(
@@ -400,9 +432,6 @@ public class UserInterface {
     // -------------------------------------------------------------------------
 
     private void handleTransform() {
-        if (!checkLoaded()) {
-            return;
-        }
         menu.displayTransformMenu();
         int choice = readChoice();
 
@@ -599,9 +628,6 @@ public class UserInterface {
     // -------------------------------------------------------------------------
 
     private void handleSql() {
-        if (!checkLoaded()) {
-            return;
-        }
         System.out.println(
             "DataFrame disponível como: "
             + sqlExecutor.getViewName());
@@ -629,10 +655,6 @@ public class UserInterface {
     // -------------------------------------------------------------------------
 
     private void handleJoin() {
-        if (!checkLoaded()) {
-            return;
-        }
-
         System.out.println("Carregando segundo arquivo para join...");
         menu.displayLoadFormatMenu();
         int formatChoice = readChoice();
@@ -643,14 +665,12 @@ public class UserInterface {
                     secondaryDf = loadSecondaryFile();
                     break;
                 case 2:
-                    String parquetPath = input.readLine(
-                        "Caminho do arquivo/diretório Parquet: ");
-                    secondaryDf = loader.loadParquet(parquetPath);
+                    secondaryDf = loader.loadParquet(
+                        input.readFilePath("parquet"));
                     break;
                 case FMT_JSON:
-                    String jsonPath = input.readLine(
-                        "Caminho do arquivo/diretório JSON: ");
-                    secondaryDf = loader.loadJson(jsonPath);
+                    secondaryDf = loader.loadJson(
+                        input.readFilePath("json"));
                     break;
                 default:
                     menu.printError("Formato inválido.");
@@ -708,8 +728,9 @@ public class UserInterface {
     }
 
     private Dataset<Row> loadSecondaryFile() {
-        String path = input.readLine(
-            "Caminho do CSV (ou 'example' para dados de exemplo): ");
+        System.out.println(
+            "Digite 'example' para carregar os dados de exemplo.");
+        String path = input.readFilePath("csv");
         if (path.equalsIgnoreCase("example")) {
             return loader.loadSample();
         }
@@ -728,9 +749,6 @@ public class UserInterface {
     // -------------------------------------------------------------------------
 
     private void handleProfile() {
-        if (!checkLoaded()) {
-            return;
-        }
         profiler.profile(currentDf);
         history.record(
             "Perfil de dados",
@@ -750,9 +768,6 @@ public class UserInterface {
     // -------------------------------------------------------------------------
 
     private void handleExport() {
-        if (!checkLoaded()) {
-            return;
-        }
         menu.displayExportMenu();
 
         ExportFormat format = toExportFormat(readChoice());
@@ -800,18 +815,13 @@ public class UserInterface {
     // Helpers
     // -------------------------------------------------------------------------
 
-    private boolean checkLoaded() {
-        if (currentDf == null) {
-            menu.printError(
-                "Nenhum dado carregado. Use a opção 1 primeiro.");
-            return false;
-        }
-        return true;
-    }
-
     private int readChoice() {
+        String line;
+        do {
+            line = input.readLine("").trim();
+        } while (line.isEmpty());
         try {
-            return Integer.parseInt(input.readLine(""));
+            return Integer.parseInt(line);
         } catch (NumberFormatException e) {
             return -1;
         }
@@ -823,7 +833,7 @@ public class UserInterface {
             case 2: return AggFunction.SUM;
             case FMT_JSON: return AggFunction.MIN;
             case TOPT_SORT: return AggFunction.MAX;
-            case OPT_FILTER: return AggFunction.COUNT;
+            case AGG_COUNT: return AggFunction.COUNT;
             default: return null;
         }
     }
@@ -853,7 +863,7 @@ public class UserInterface {
             case 2: return WindowFunctionType.DENSE_RANK;
             case FMT_JSON: return WindowFunctionType.ROW_NUMBER;
             case TOPT_SORT: return WindowFunctionType.LAG;
-            case OPT_FILTER: return WindowFunctionType.LEAD;
+            case WIN_LEAD: return WindowFunctionType.LEAD;
             default: return null;
         }
     }
