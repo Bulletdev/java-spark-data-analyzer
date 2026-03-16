@@ -97,4 +97,15 @@ class DataExporterTest extends SparkTestBase {
 
         assertEquals(df.count(), reloaded.count());
     }
+
+    @Test
+    void export_singleFile_createsSinglePartFile() {
+        String path = tempDir.resolve("out_single").toString();
+        exporter.export(df, path, ExportFormat.CSV, false, true, true, ",");
+
+        java.io.File[] parts = new java.io.File(path).listFiles(
+            f -> f.getName().startsWith("part-"));
+        assertNotNull(parts);
+        assertEquals(1, parts.length);
+    }
 }

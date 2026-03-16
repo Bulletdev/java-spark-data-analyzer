@@ -12,7 +12,7 @@ import java.util.Arrays;
  */
 public final class SchemaValidator {
 
-    private SchemaValidator() {}
+    private SchemaValidator() { }
 
     /**
      * Returns true if the DataFrame contains a column with the given name.
@@ -21,7 +21,8 @@ public final class SchemaValidator {
      * @param columnName column name to look up
      * @return {@code true} if the column exists
      */
-    public static boolean columnExists(Dataset<Row> df, String columnName) {
+    public static boolean columnExists(
+            final Dataset<Row> df, final String columnName) {
         return Arrays.asList(df.columns()).contains(columnName);
     }
 
@@ -32,7 +33,9 @@ public final class SchemaValidator {
      * @param columnNames column names to check
      * @return {@code true} if every column is present
      */
-    public static boolean allColumnsExist(Dataset<Row> df, String... columnNames) {
+    public static boolean allColumnsExist(
+            final Dataset<Row> df,
+            final String... columnNames) {
         return Arrays.stream(columnNames)
             .allMatch(c -> columnExists(df, c));
     }
@@ -44,8 +47,11 @@ public final class SchemaValidator {
      * @param columnName column name to check
      * @return {@code true} if the column is numeric
      */
-    public static boolean isNumeric(Dataset<Row> df, String columnName) {
-        if (!columnExists(df, columnName)) return false;
+    public static boolean isNumeric(
+            final Dataset<Row> df, final String columnName) {
+        if (!columnExists(df, columnName)) {
+            return false;
+        }
         StructField field = df.schema().apply(columnName);
         return field.dataType().equals(DataTypes.IntegerType)
             || field.dataType().equals(DataTypes.LongType)

@@ -5,14 +5,23 @@ package com.dataanalyzer.core;
  */
 public enum ExportFormat {
 
+    /** CSV format. */
     CSV("CSV"),
+
+    /** Parquet format. */
     PARQUET("Parquet"),
+
+    /** JSON format. */
     JSON("JSON");
 
+    /** Human-readable label for display in menus. */
     private final String label;
 
-    ExportFormat(String label) {
-        this.label = label;
+    /**
+     * @param lbl human-readable label
+     */
+    ExportFormat(final String lbl) {
+        this.label = lbl;
     }
 
     /** @return human-readable label for display in menus */

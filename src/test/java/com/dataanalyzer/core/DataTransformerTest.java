@@ -202,4 +202,91 @@ class DataTransformerTest extends SparkTestBase {
 
         assertEquals(df.count(), result.count());
     }
+
+    // ---- castColumn ----
+
+    @Test
+    void castColumn_stringToDouble_convertsType() {
+        // Quantidade is int; cast to double
+        Dataset<Row> result = transformer.castColumn(df, "Quantidade", "double");
+
+        String typeName = result.schema().apply("Quantidade")
+            .dataType().simpleString();
+        assertEquals("double", typeName);
+    }
+
+    @Test
+    void castColumn_nonexistentColumn_throwsException() {
+        assertThrows(IllegalArgumentException.class, () ->
+            transformer.castColumn(df, "DoesNotExist", "int")
+        );
+    }
+
+    // ---- fillNull ----
+
+    @Test
+    void fillNull_replacesNulls() {
+        // Introduce a null by creating a DF with a null value
+        Dataset<Row> withNull = spark.sql(
+            "SELECT * FROM (VALUES (NULL, 'test')) AS t(a, b)");
+        Dataset<Row> result = transformer.fillNull(withNull, "a", "0");
+
+        long nullCount = result.filter(
+            org.apache.spark.sql.functions.col("a").isNull()).count();
+        assertEquals(0, nullCount);
+    }
+
+    @Test
+    void fillNull_nonexistentColumn_throwsException() {
+        assertThrows(IllegalArgumentException.class, () ->
+            transformer.fillNull(df, "DoesNotExist", "0")
+        );
+    }
+
+    // ---- sample ----
+
+    @Test
+    void sample_returnsFraction() {
+        Dataset<Row> result = transformer.sample(df, 0.5, true);
+
+        // Sampled result should have fewer or equal rows
+        assertTrue(result.count() <= df.count());
+    }
+
+    @Test
+    void sample_fractionOutOfRange_throwsException() {
+        assertThrows(IllegalArgumentException.class, () ->
+            transformer.sample(df, 0.0, false)
+        );
+        assertThrows(IllegalArgumentException.class, () ->
+            transformer.sample(df, 1.5, false)
+        );
+    }
+
+    // ---- applyWindowFunction ----
+
+    @Test
+    void applyWindowFunction_rank_addsColumn() {
+        Dataset<Row> result = transformer.applyWindowFunction(
+            df, "rnk", WindowFunctionType.RANK, "Categoria", "Preco", 0);
+
+        assertTrue(Arrays.asList(result.columns()).contains("rnk"));
+        assertEquals(df.count(), result.count());
+    }
+
+    @Test
+    void applyWindowFunction_existingColumnName_throwsException() {
+        assertThrows(IllegalArgumentException.class, () ->
+            transformer.applyWindowFunction(
+                df, "Preco", WindowFunctionType.RANK, null, "Preco", 0)
+        );
+    }
+
+    @Test
+    void applyWindowFunction_invalidOrderByColumn_throwsException() {
+        assertThrows(IllegalArgumentException.class, () ->
+            transformer.applyWindowFunction(
+                df, "rnk", WindowFunctionType.RANK, null, "Ghost", 0)
+        );
+    }
 }

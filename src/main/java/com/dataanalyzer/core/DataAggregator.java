@@ -7,7 +7,12 @@ import org.apache.spark.sql.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.spark.sql.functions.*;
+import static org.apache.spark.sql.functions.avg;
+import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.count;
+import static org.apache.spark.sql.functions.max;
+import static org.apache.spark.sql.functions.min;
+import static org.apache.spark.sql.functions.sum;
 
 /**
  * Performs aggregation operations on Spark DataFrames.
@@ -17,7 +22,8 @@ import static org.apache.spark.sql.functions.*;
  */
 public class DataAggregator {
 
-    private static final Logger log =
+    /** Logger for this class. */
+    private static final Logger LOG =
         LoggerFactory.getLogger(DataAggregator.class);
 
     /**
@@ -27,52 +33,59 @@ public class DataAggregator {
      * @param df              input DataFrame
      * @param aggregateColumn column whose values are aggregated
      * @param function        aggregation function to apply
-     * @param groupByColumn   column to group by, or {@code null}/empty for
-     *                        a global aggregation
+     * @param groupByColumn   column to group by, or {@code null}/empty
+     *                        for a global aggregation
      * @return aggregated DataFrame
-     * @throws IllegalArgumentException if any referenced column does not exist
+     * @throws IllegalArgumentException if any referenced column does
+     *                                  not exist
      */
     public Dataset<Row> aggregate(
-            Dataset<Row> df,
-            String aggregateColumn,
-            AggFunction function,
-            String groupByColumn) {
+            final Dataset<Row> df,
+            final String aggregateColumn,
+            final AggFunction function,
+            final String groupByColumn) {
 
         if (!SchemaValidator.columnExists(df, aggregateColumn)) {
             throw new IllegalArgumentException(
-                "Coluna para agregação não encontrada: " + aggregateColumn);
+                "Coluna para agregação não encontrada: "
+                + aggregateColumn);
         }
 
-        boolean hasGroupBy = groupByColumn != null && !groupByColumn.isEmpty();
-        if (hasGroupBy && !SchemaValidator.columnExists(df, groupByColumn)) {
+        boolean hasGroupBy =
+            groupByColumn != null && !groupByColumn.isEmpty();
+        if (hasGroupBy
+                && !SchemaValidator.columnExists(df, groupByColumn)) {
             throw new IllegalArgumentException(
-                "Coluna para agrupamento não encontrada: " + groupByColumn);
+                "Coluna para agrupamento não encontrada: "
+                + groupByColumn);
         }
 
         RelationalGroupedDataset grouped = hasGroupBy
             ? df.groupBy(col(groupByColumn))
             : null;
 
-        String resultCol = function.name().toLowerCase() + "_" + aggregateColumn;
+        String resultCol =
+            function.name().toLowerCase() + "_" + aggregateColumn;
 
         Dataset<Row> result = applyFunction(
-            df, grouped, function, aggregateColumn, resultCol, groupByColumn);
+            df, grouped, function,
+            aggregateColumn, resultCol, groupByColumn);
 
         result.cache();
         result.count();
 
-        log.info("Aggregation: {} on {} groupBy={}",
+        LOG.info("Aggregation: {} on {} groupBy={}",
             function, aggregateColumn, groupByColumn);
         return result;
     }
 
     private Dataset<Row> applyFunction(
-            Dataset<Row> df,
-            RelationalGroupedDataset grouped,
-            AggFunction function,
-            String column,
-            String alias,
-            String groupByColumn) {
+            final Dataset<Row> df,
+            final RelationalGroupedDataset grouped,
+            final AggFunction function,
+            final String column,
+            final String alias,
+            final String groupByColumn) {
 
         switch (function) {
             case AVG:

@@ -11,8 +11,10 @@ import java.util.Properties;
  */
 public class SparkConfig {
 
+    /** Loaded properties. */
     private final Properties props;
 
+    /** Creates a new SparkConfig, loading from classpath. */
     public SparkConfig() {
         props = new Properties();
         try (InputStream in = getClass()
@@ -49,7 +51,8 @@ public class SparkConfig {
 
     /** @return path to the Spark SQL warehouse directory */
     public String getWarehouseDir() {
-        return props.getProperty("spark.warehouse.dir", "spark-warehouse");
+        return props.getProperty(
+            "spark.warehouse.dir", "spark-warehouse");
     }
 
     /** @return path to the bundled sample CSV file */

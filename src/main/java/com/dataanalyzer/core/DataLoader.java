@@ -17,19 +17,26 @@ import java.io.File;
  */
 public class DataLoader {
 
-    private static final Logger log =
+    /** Logger for this class. */
+    private static final Logger LOG =
         LoggerFactory.getLogger(DataLoader.class);
 
+    /** Active Spark session. */
     private final SparkSession spark;
+
+    /** Application configuration for sample data path. */
     private final SparkConfig config;
 
     /**
-     * @param spark  active SparkSession
-     * @param config application configuration (used for sample data path)
+     * @param sparkSession active SparkSession
+     * @param sparkConfig  application configuration
+     *                     (used for sample data path)
      */
-    public DataLoader(SparkSession spark, SparkConfig config) {
-        this.spark = spark;
-        this.config = config;
+    public DataLoader(
+            final SparkSession sparkSession,
+            final SparkConfig sparkConfig) {
+        this.spark = sparkSession;
+        this.config = sparkConfig;
     }
 
     /**
@@ -41,12 +48,16 @@ public class DataLoader {
      * @return loaded and cached DataFrame
      * @throws IllegalArgumentException if the file does not exist
      */
-    public Dataset<Row> load(String path, boolean hasHeader, String delimiter) {
+    public Dataset<Row> load(
+            final String path,
+            final boolean hasHeader,
+            final String delimiter) {
         if (!new File(path).exists()) {
-            throw new IllegalArgumentException("Arquivo não encontrado: " + path);
+            throw new IllegalArgumentException(
+                "Arquivo não encontrado: " + path);
         }
 
-        log.info("Loading file: {}", path);
+        LOG.info("Loading file: {}", path);
         System.out.println("Carregando dados...");
 
         Dataset<Row> df = spark.read()
@@ -61,7 +72,7 @@ public class DataLoader {
         System.out.printf(
             "Dados carregados! Linhas: %d | Colunas: %d%n",
             rowCount, df.columns().length);
-        log.info("Loaded {} rows, {} columns from {}",
+        LOG.info("Loaded {} rows, {} columns from {}",
             rowCount, df.columns().length, path);
 
         return df;
@@ -74,5 +85,68 @@ public class DataLoader {
      */
     public Dataset<Row> loadSample() {
         return load(config.getSampleDataPath(), true, ",");
+    }
+
+    /**
+     * Loads a Parquet file or directory into a cached DataFrame.
+     *
+     * @param path path to the Parquet file or directory
+     * @return loaded and cached DataFrame
+     * @throws IllegalArgumentException if the path does not exist
+     */
+    public Dataset<Row> loadParquet(final String path) {
+        if (!new File(path).exists()) {
+            throw new IllegalArgumentException(
+                "Arquivo/diretório Parquet não encontrado: " + path);
+        }
+
+        LOG.info("Loading Parquet: {}", path);
+        System.out.println("Carregando dados Parquet...");
+
+        Dataset<Row> df = spark.read().parquet(path);
+
+        df.cache();
+        long rowCount = df.count();
+
+        System.out.printf(
+            "Dados carregados! Linhas: %d | Colunas: %d%n",
+            rowCount, df.columns().length);
+        LOG.info("Loaded {} rows, {} columns from Parquet {}",
+            rowCount, df.columns().length, path);
+
+        return df;
+    }
+
+    /**
+     * Loads a JSON file (one JSON object per line) into a cached
+     * DataFrame.
+     *
+     * @param path path to the JSON file or directory
+     * @return loaded and cached DataFrame
+     * @throws IllegalArgumentException if the path does not exist
+     */
+    public Dataset<Row> loadJson(final String path) {
+        if (!new File(path).exists()) {
+            throw new IllegalArgumentException(
+                "Arquivo/diretório JSON não encontrado: " + path);
+        }
+
+        LOG.info("Loading JSON: {}", path);
+        System.out.println("Carregando dados JSON...");
+
+        Dataset<Row> df = spark.read()
+            .option("inferSchema", "true")
+            .json(path);
+
+        df.cache();
+        long rowCount = df.count();
+
+        System.out.printf(
+            "Dados carregados! Linhas: %d | Colunas: %d%n",
+            rowCount, df.columns().length);
+        LOG.info("Loaded {} rows, {} columns from JSON {}",
+            rowCount, df.columns().length, path);
+
+        return df;
     }
 }

@@ -14,12 +14,13 @@ import org.slf4j.LoggerFactory;
  */
 public class DataExporter {
 
-    private static final Logger log =
+    /** Logger for this class. */
+    private static final Logger LOG =
         LoggerFactory.getLogger(DataExporter.class);
 
     /**
      * Exports the DataFrame using default CSV options
-     * (header enabled, comma delimiter).
+     * (header enabled, comma delimiter, multi-part output).
      *
      * @param df        DataFrame to export
      * @param path      destination directory path
@@ -27,30 +28,62 @@ public class DataExporter {
      * @param overwrite {@code true} to overwrite an existing directory
      */
     public void export(
-            Dataset<Row> df, String path, ExportFormat format,
-            boolean overwrite) {
-        export(df, path, format, overwrite, true, ",");
+            final Dataset<Row> df,
+            final String path,
+            final ExportFormat format,
+            final boolean overwrite) {
+        export(df, path, format, overwrite, false, true, ",");
     }
 
     /**
-     * Exports the DataFrame with full control over CSV formatting options.
+     * Exports the DataFrame with full control over CSV formatting.
+     *
+     * <p>This overload uses multi-part output (no coalesce).
      *
      * @param df           DataFrame to export
      * @param path         destination directory path
      * @param format       output format
-     * @param overwrite    {@code true} to overwrite an existing directory
+     * @param overwrite    {@code true} to overwrite an existing dir
      * @param csvHeader    include a header row (CSV only)
      * @param csvDelimiter field separator character (CSV only)
-     * @throws IllegalArgumentException if the path is blank or the format
-     *                                  is not supported
+     * @throws IllegalArgumentException if the path is blank or the
+     *                                  format is not supported
      */
     public void export(
-            Dataset<Row> df,
-            String path,
-            ExportFormat format,
-            boolean overwrite,
-            boolean csvHeader,
-            String csvDelimiter) {
+            final Dataset<Row> df,
+            final String path,
+            final ExportFormat format,
+            final boolean overwrite,
+            final boolean csvHeader,
+            final String csvDelimiter) {
+        export(df, path, format, overwrite, false,
+            csvHeader, csvDelimiter);
+    }
+
+    /**
+     * Exports the DataFrame with full control over all export options
+     * including single-file coalescing.
+     *
+     * @param df           DataFrame to export
+     * @param path         destination directory path
+     * @param format       output format
+     * @param overwrite    {@code true} to overwrite an existing dir
+     * @param singleFile   {@code true} to coalesce into one part file;
+     *                     note that coalescing can be slow for large
+     *                     datasets
+     * @param csvHeader    include a header row (CSV only)
+     * @param csvDelimiter field separator character (CSV only)
+     * @throws IllegalArgumentException if the path is blank or the
+     *                                  format is not supported
+     */
+    public void export(
+            final Dataset<Row> df,
+            final String path,
+            final ExportFormat format,
+            final boolean overwrite,
+            final boolean singleFile,
+            final boolean csvHeader,
+            final String csvDelimiter) {
 
         if (path == null || path.isEmpty()) {
             throw new IllegalArgumentException(
@@ -58,10 +91,19 @@ public class DataExporter {
         }
 
         String saveMode = overwrite ? "overwrite" : "errorifexists";
-        log.info("Exporting to {} as {} (mode={})", path, format, saveMode);
+        LOG.info("Exporting to {} as {} (mode={}, singleFile={})",
+            path, format, saveMode, singleFile);
         System.out.println("Salvando dados em: " + path);
 
-        DataFrameWriter<Row> writer = df.write().mode(saveMode);
+        if (singleFile) {
+            System.out.println(
+                "Atenção: coalesce pode ser lento para datasets"
+                + " grandes.");
+        }
+
+        Dataset<Row> dfToWrite = singleFile ? df.coalesce(1) : df;
+        DataFrameWriter<Row> writer =
+            dfToWrite.write().mode(saveMode);
 
         switch (format) {
             case CSV:
@@ -81,6 +123,6 @@ public class DataExporter {
         }
 
         System.out.println("Dados salvos com sucesso em: " + path);
-        log.info("Export completed: {}", path);
+        LOG.info("Export completed: {}", path);
     }
 }

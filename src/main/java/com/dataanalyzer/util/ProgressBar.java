@@ -14,31 +14,46 @@ package com.dataanalyzer.util;
  */
 public class ProgressBar {
 
+    /** Default width (number of bar characters) for the no-arg constructor. */
+    private static final int DEFAULT_WIDTH = 50;
+
+    /** Multiplier used to convert a [0,1] progress fraction to a percentage. */
+    private static final int PERCENT_FACTOR = 100;
+
+    /** Total number of bar characters rendered inside the brackets. */
     private final int width;
+
+    /** Character used for the filled portion of the bar. */
     private final char barChar;
+
+    /** Character used for the empty portion of the bar. */
     private final char emptyChar;
+
+    /** Printf format string, chosen at construction time. */
     private final String format;
+
+    /** Most recently set status message, kept for single-arg update calls. */
     private String currentStatus = "";
 
     /**
      * Creates a progress bar with custom settings.
      *
-     * @param width       total number of bar characters
-     * @param barChar     character used for the filled portion
-     * @param emptyChar   character used for the empty portion
+     * @param barWidth    total number of bar characters
+     * @param filledChar  character used for the filled portion
+     * @param emptyCharIn character used for the empty portion
      * @param showPercent whether to render a percentage value
      */
-    public ProgressBar(int width, char barChar, char emptyChar,
-                       boolean showPercent) {
-        this.width = width;
-        this.barChar = barChar;
-        this.emptyChar = emptyChar;
+    public ProgressBar(final int barWidth, final char filledChar,
+                       final char emptyCharIn, final boolean showPercent) {
+        this.width = barWidth;
+        this.barChar = filledChar;
+        this.emptyChar = emptyCharIn;
         this.format = showPercent ? "\r[%s] %3d%% %s" : "\r[%s] %s";
     }
 
     /** Creates a default 50-character bar with percentage display. */
     public ProgressBar() {
-        this(50, '█', '░', true);
+        this(DEFAULT_WIDTH, '\u2588', '\u2591', true);
     }
 
     /**
@@ -47,7 +62,7 @@ public class ProgressBar {
      * @param progress value between 0.0 and 1.0 (clamped automatically)
      * @param status   status message shown after the bar
      */
-    public void update(double progress, String status) {
+    public void update(final double progress, final String status) {
         double clamped = Math.max(0.0, Math.min(1.0, progress));
         int filledWidth = (int) (width * clamped);
 
@@ -60,7 +75,8 @@ public class ProgressBar {
 
         if (format.contains("%3d")) {
             System.out.printf(
-                format, bar.toString(), (int) (clamped * 100), currentStatus);
+                format, bar.toString(),
+                (int) (clamped * PERCENT_FACTOR), currentStatus);
         } else {
             System.out.printf(format, bar.toString(), currentStatus);
         }
@@ -71,7 +87,7 @@ public class ProgressBar {
      *
      * @param progress value between 0.0 and 1.0
      */
-    public void update(double progress) {
+    public void update(final double progress) {
         update(progress, currentStatus);
     }
 
@@ -85,7 +101,7 @@ public class ProgressBar {
      *
      * @param completionMessage message to display after finishing
      */
-    public void complete(String completionMessage) {
+    public void complete(final String completionMessage) {
         System.out.println();
         System.out.println(completionMessage);
     }

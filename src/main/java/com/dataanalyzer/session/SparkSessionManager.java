@@ -13,17 +13,21 @@ import java.io.File;
  */
 public class SparkSessionManager {
 
-    private static final Logger log =
+    /** Logger for this class. */
+    private static final Logger LOG =
         LoggerFactory.getLogger(SparkSessionManager.class);
 
+    /** Application configuration. */
     private final SparkConfig config;
+
+    /** The active Spark session. */
     private SparkSession session;
 
     /**
-     * @param config application configuration
+     * @param sparkConfig application configuration
      */
-    public SparkSessionManager(SparkConfig config) {
-        this.config = config;
+    public SparkSessionManager(final SparkConfig sparkConfig) {
+        this.config = sparkConfig;
     }
 
     /**
@@ -45,7 +49,8 @@ public class SparkSessionManager {
             .getOrCreate();
 
         session.sparkContext().setLogLevel(config.getLogLevel());
-        log.info("SparkSession initialized. Version: {}", session.version());
+        LOG.info("SparkSession initialized. Version: {}",
+            session.version());
         return session;
     }
 
@@ -64,7 +69,7 @@ public class SparkSessionManager {
     public void shutdown() {
         if (session != null && !session.sparkContext().isStopped()) {
             session.stop();
-            log.info("SparkSession stopped.");
+            LOG.info("SparkSession stopped.");
         }
     }
 }

@@ -13,13 +13,14 @@ import java.util.stream.Collectors;
  */
 public class InputReader {
 
+    /** Underlying scanner used to read user input. */
     private final Scanner scanner;
 
     /**
-     * @param scanner the underlying scanner to read from
+     * @param inputScanner the underlying scanner to read from
      */
-    public InputReader(Scanner scanner) {
-        this.scanner = scanner;
+    public InputReader(final Scanner inputScanner) {
+        this.scanner = inputScanner;
     }
 
     /**
@@ -28,7 +29,7 @@ public class InputReader {
      * @param prompt message displayed before reading
      * @return trimmed input string (never {@code null})
      */
-    public String readLine(String prompt) {
+    public String readLine(final String prompt) {
         System.out.print(prompt);
         return scanner.nextLine().trim();
     }
@@ -37,14 +38,15 @@ public class InputReader {
      * Prints a prompt and reads an integer.
      *
      * @param prompt message displayed before reading
-     * @return parsed integer, or {@code -1} if the input is not a valid number
+     * @return parsed integer, or {@code -1} if the input is not valid
      */
-    public int readInt(String prompt) {
+    public int readInt(final String prompt) {
         System.out.print(prompt);
         try {
             return Integer.parseInt(scanner.nextLine().trim());
         } catch (NumberFormatException e) {
-            System.out.println("Entrada inválida. Digite um número inteiro.");
+            System.out.println(
+                "Entrada inválida. Digite um número inteiro.");
             return -1;
         }
     }
@@ -53,9 +55,10 @@ public class InputReader {
      * Prints a prompt and reads a yes/no answer.
      *
      * @param prompt message displayed before reading
-     * @return {@code true} if the answer starts with {@code 's'} (case-insensitive)
+     * @return {@code true} if the answer starts with {@code 's'}
+     *         (case-insensitive)
      */
-    public boolean readBoolean(String prompt) {
+    public boolean readBoolean(final String prompt) {
         System.out.print(prompt);
         return scanner.nextLine().trim().toLowerCase().startsWith("s");
     }
@@ -66,7 +69,7 @@ public class InputReader {
      * @param prompt message displayed before reading
      * @return list of non-empty, trimmed tokens
      */
-    public List<String> readList(String prompt) {
+    public List<String> readList(final String prompt) {
         System.out.print(prompt);
         return Arrays.stream(scanner.nextLine().split(","))
             .map(String::trim)
