@@ -2,26 +2,31 @@
 
 <div align="center">
 
-![Java](https://img.shields.io/badge/Java-11+-orange.svg)
-![Apache Spark](https://img.shields.io/badge/Apache%20Spark-3.4.1-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Java](https://img.shields.io/badge/Java-21-orange.svg)
+![Apache Spark](https://img.shields.io/badge/Apache%20Spark-3.5.3-blue.svg)
+[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](http://creativecommons.org/licenses/by-nc-sa/4.0/)
 
 </div>
 
-Ferramenta CLI interativa para análise exploratória de dados utilizando **Apache Spark 3.4** e **Java 11**.
+Ferramenta CLI interativa para análise exploratória de dados utilizando **Apache Spark 3.5** e **Java 21**.
 
-Carregue arquivos CSV, explore schemas, aplique filtros e transformações, gere agregações e exporte os resultados — tudo sem escrever uma linha de código.
+Carregue arquivos CSV, Parquet ou JSON, explore schemas, aplique filtros e transformações, execute SQL, realize joins, perfils de dados e exporte os resultados — tudo sem escrever uma linha de código.
 
 ---
 
 ## Funcionalidades
 
-- Carregamento de CSV com inferência automática de schema
-- Visualização de schema, amostra e estatísticas descritivas (com contagem de nulos por coluna)
-- Filtros com operadores `=`, `>`, `<`, `>=`, `<=`, `!=`
-- Agregações (`avg`, `sum`, `min`, `max`, `count`) com `GROUP BY` opcional
-- Transformações: seleção de colunas, renomear, criar colunas via expressão SQL, ordenar, remover duplicatas e nulos
-- Exportação nos formatos **CSV**, **Parquet** e **JSON**
+- **Carregamento multi-formato**: CSV, Parquet e JSON com inferência automática de schema
+- **Exploração**: schema, amostra e estatísticas descritivas (com contagem de nulos por coluna)
+- **Filtros** com operadores `=`, `>`, `<`, `>=`, `<=`, `!=`
+- **Agregações** (`avg`, `sum`, `min`, `max`, `count`) com `GROUP BY` opcional
+- **Transformações**: seleção, renomear, criar colunas via expressão SQL, ordenar, remover duplicatas/nulos, cast de tipos, preenchimento de nulos, amostragem
+- **Funções de janela**: `RANK`, `DENSE_RANK`, `ROW_NUMBER`, `LAG`, `LEAD`
+- **SQL interativo**: execute queries SQL diretamente sobre o DataFrame carregado
+- **Joins**: INNER, LEFT, RIGHT e FULL OUTER com chave simples ou múltiplas colunas
+- **Data Profiler**: análise completa por coluna (tipo, nulos, distintos, min/max)
+- **Histórico de operações**: rastreamento de todas as transformações aplicadas
+- **Exportação**: CSV, Parquet e JSON com suporte a arquivo único (coalesce)
 
 ---
 
@@ -36,21 +41,28 @@ src/main/java/com/dataanalyzer/
 ├── session/
 │   └── SparkSessionManager.java   SparkSession lifecycle
 ├── core/
-│   ├── DataLoader.java            CSV loading
-│   ├── DataTransformer.java       Stateless transformations
+│   ├── DataLoader.java            CSV / Parquet / JSON loading
+│   ├── DataTransformer.java       Stateless transformations + window functions
 │   ├── DataAggregator.java        Stateless aggregations
 │   ├── DataExporter.java          CSV / Parquet / JSON export
+│   ├── SqlExecutor.java           Spark SQL query execution
+│   ├── DataJoiner.java            DataFrame join operations
+│   ├── DataProfiler.java          Per-column data profiling
 │   ├── AggFunction.java           Aggregation function enum
-│   └── ExportFormat.java          Export format enum
+│   ├── ExportFormat.java          Export format enum
+│   ├── JoinType.java              Join type enum
+│   ├── ColumnType.java            Column type enum
+│   └── WindowFunctionType.java    Window function enum
 ├── ui/
 │   ├── MenuRenderer.java          Renders all CLI menus
 │   └── InputReader.java           Typed input reading
 └── util/
+    ├── OperationHistory.java       Operation history tracking
     ├── ProgressBar.java            Terminal progress bar
     └── SchemaValidator.java        DataFrame schema helpers
 ```
 
-**Princípio central:** `DataTransformer` e `DataAggregator` são completamente stateless — recebem e retornam `Dataset<Row>`. O estado (DataFrame atual) é mantido apenas pela `UserInterface`.
+**Princípio central:** todas as classes `core/` são completamente stateless — recebem e retornam `Dataset<Row>`. O estado (DataFrame atual) é mantido apenas pela `UserInterface`.
 
 ---
 
@@ -58,16 +70,8 @@ src/main/java/com/dataanalyzer/
 
 | Componente | Versão mínima |
 |------------|--------------|
-| Java       | 11           |
+| Java       | 21           |
 | Maven      | 3.8+         |
-
-> **Java 17+**: adicione as flags JVM abaixo ao executar o JAR:
-> ```
-> --add-opens java.base/sun.nio.ch=ALL-UNNAMED
-> --add-opens java.base/java.nio=ALL-UNNAMED
-> --add-opens java.base/java.lang=ALL-UNNAMED
-> --add-opens java.base/java.util=ALL-UNNAMED
-> ```
 
 ---
 
@@ -127,37 +131,37 @@ O arquivo `src/main/resources/dados_vendas.csv` contém dados de vendas de eletr
 =================================
        Java Data Analyzer
 =================================
-1. Carregar dados
-...
-Escolha (1-9): 1
+ 1. Carregar dados
+ 2. Schema e colunas
+ 3. Amostra de dados
+ 4. Estatísticas descritivas
+ 5. Filtrar dados
+ 6. Agregar dados
+ 7. Transformar dados
+ 8. Exportar dados
+ 9. Executar SQL
+10. Join com outro dataset
+11. Data Profiler
+12. Histórico de operações
+13. Sair
+=================================
+Escolha (1-13): 1
 
-Caminho do CSV (ou 'example' para dados de exemplo): example
+Formato (1-CSV, 2-Parquet, 3-JSON): 1
+Caminho do arquivo: dados_vendas.csv
 Dados carregados! Linhas: 100 | Colunas: 10
 
-Escolha (1-9): 6
-Coluna para agrupar (Enter para não agrupar): Regiao
-Coluna para agregar: Preco
-Função (1-5): 2   ← SUM
+Escolha (1-13): 9
+Query SQL (use 'df' como nome da tabela):
+> SELECT Categoria, SUM(Preco * Quantidade) AS total FROM df GROUP BY Categoria ORDER BY total DESC
 
---- Resultado da Agregação ---
-+-------+----------+
-|Regiao |sum_Preco |
-+-------+----------+
-|Norte  |45230.00  |
-|Sul    |67890.50  |
++-----------+----------+
+|Categoria  |total     |
++-----------+----------+
+|Eletrônicos|125430.00 |
+|Móveis     |67890.50  |
 ...
 ```
-
----
-
-## Solução de Problemas
-
-### Windows e Hadoop
-
-O Spark usa funcionalidades do Hadoop que podem gerar avisos no Windows. Se encontrar avisos relacionados ao `winutils.exe`:
-
-1. Ignore-os (não afetam a funcionalidade)
-2. Ou configure o ambiente: baixe o [winutils.exe](https://github.com/cdarlint/winutils), crie `C:\hadoop\bin`, coloque o arquivo lá e defina `HADOOP_HOME=C:\hadoop`
 
 ---
 
@@ -165,7 +169,7 @@ O Spark usa funcionalidades do Hadoop que podem gerar avisos no Windows. Se enco
 
 | Tecnologia      | Versão | Uso                                |
 |-----------------|--------|------------------------------------|
-| Apache Spark    | 3.4.1  | Processamento distribuído de dados |
+| Apache Spark    | 3.5.3  | Processamento distribuído de dados |
 | Scala (runtime) | 2.12   | Runtime do Spark                   |
 | JUnit Jupiter   | 5.10   | Testes de integração               |
 | JaCoCo          | 0.8.10 | Cobertura de testes                |
@@ -175,4 +179,6 @@ O Spark usa funcionalidades do Hadoop que podem gerar avisos no Windows. Se enco
 
 ## Licença
 
-MIT
+Este projeto está licenciado sob a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International](http://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+[![License](https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-lightgrey.svg)](http://creativecommons.org/licenses/by-nc-sa/4.0/)

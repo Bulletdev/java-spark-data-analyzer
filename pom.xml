@@ -12,11 +12,24 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <spark.version>3.4.1</spark.version>
+        <spark.version>3.5.3</spark.version>
         <scala.version>2.12</scala.version>
         <junit.version>5.10.0</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- JVM opens obrigatórios para Spark 3.x no Java 17+ -->
+        <spark.jvm.opens>--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/sun.nio.cs=ALL-UNNAMED --add-opens=java.base/sun.security.action=ALL-UNNAMED --add-opens=java.base/sun.util.calendar=ALL-UNNAMED</spark.jvm.opens>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Force jackson-core to 2.15.x (StreamReadConstraints) required by Spark 3.5 -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>2.15.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Apache Spark Core -->
@@ -54,11 +67,14 @@
                 </configuration>
             </plugin>
 
-            <!-- Surefire para JUnit 5 -->
+            <!-- Surefire para JUnit 5 — flags obrigatórias para Spark 3.x no Java 17+ -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
+                <configuration>
+                    <argLine>@{argLine} ${spark.jvm.opens}</argLine>
+                </configuration>
             </plugin>
 
             <!-- JaCoCo para cobertura de testes -->
