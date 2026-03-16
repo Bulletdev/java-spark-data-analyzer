@@ -1,15 +1,31 @@
 package com.dataanalyzer;
 
+import com.dataanalyzer.config.SparkConfig;
+import com.dataanalyzer.core.DataAggregator;
+import com.dataanalyzer.core.DataExporter;
+import com.dataanalyzer.core.DataLoader;
+import com.dataanalyzer.core.DataTransformer;
+import com.dataanalyzer.session.SparkSessionManager;
+import com.dataanalyzer.ui.InputReader;
+import com.dataanalyzer.ui.MenuRenderer;
 import org.apache.spark.sql.SparkSession;
-import com.dataanalyzer.SparkOperations;
-import com.dataanalyzer.UserInterface;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.util.Scanner;
 
+/**
+ * Application entry point.
+ *
+ * <p>Wires together configuration, the Spark session, all service classes,
+ * and the user interface before handing control to the interactive loop.
+ */
 public class DataAnalyzer {
 
-    private SparkSession spark;
-    private SparkOperations sparkOperations;
+    private static final Logger log =
+        LoggerFactory.getLogger(DataAnalyzer.class);
+
+    private SparkSessionManager sessionManager;
     private UserInterface userInterface;
 
     public static void main(String[] args) {
@@ -19,35 +35,36 @@ public class DataAnalyzer {
         analyzer.shutdown();
     }
 
+    /** Initialises all components and starts the SparkSession. */
     public void initialize() {
-        System.setProperty("java.security.auth.login.config", "");
-        System.setProperty("hadoop.home.dir", new File("").getAbsolutePath());
+        SparkConfig config = new SparkConfig();
+        sessionManager = new SparkSessionManager(config);
+        SparkSession spark = sessionManager.initialize();
 
-        spark = SparkSession.builder()
-                .appName("Java Data Analyzer")
-                .master("local[*]")
-                .config("spark.sql.warehouse.dir", "spark-warehouse")
-                .config("spark.ui.enabled", "false")
-                .config("spark.driver.host", "localhost")
-                .getOrCreate();
+        DataLoader loader       = new DataLoader(spark, config);
+        DataTransformer transformer = new DataTransformer();
+        DataAggregator aggregator   = new DataAggregator();
+        DataExporter exporter       = new DataExporter();
+        InputReader inputReader     = new InputReader(new Scanner(System.in));
+        MenuRenderer menuRenderer   = new MenuRenderer();
 
-        spark.sparkContext().setLogLevel("ERROR");
+        userInterface = new UserInterface(
+            loader, transformer, aggregator,
+            exporter, inputReader, menuRenderer);
 
-        sparkOperations = new SparkOperations(spark);
-        userInterface = new UserInterface(sparkOperations);
-
-        System.out.println("Spark inicializado com sucesso!");
-        System.out.println("Versão: " + spark.version());
+        System.out.println("Java Data Analyzer iniciado!");
+        System.out.println("Apache Spark " + spark.version());
+        log.info("Application initialized.");
     }
 
+    /** Starts the interactive CLI loop. */
     public void run() {
         userInterface.run();
     }
 
     private void shutdown() {
-        if (spark != null) {
-            spark.stop();
-            System.out.println("Sessão Spark encerrada. Até mais!");
-        }
+        sessionManager.shutdown();
+        System.out.println("Sessão Spark encerrada. Até mais!");
+        log.info("Application shutdown.");
     }
 }
