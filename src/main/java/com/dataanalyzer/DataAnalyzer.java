@@ -16,6 +16,7 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 /**
@@ -62,6 +63,7 @@ public class DataAnalyzer {
         DataJoiner joiner           = new DataJoiner();
         DataProfiler profiler       = new DataProfiler();
         OperationHistory history    = new OperationHistory();
+        drainStdin();
         InputReader inputReader
             = new InputReader(new Scanner(System.in));
         MenuRenderer menuRenderer   = new MenuRenderer();
@@ -88,6 +90,24 @@ public class DataAnalyzer {
     /** Starts the interactive CLI loop. */
     public void run() {
         userInterface.run();
+    }
+
+    /**
+     * Drains any bytes injected into stdin during Spark initialisation.
+     *
+     * <p>Spark/Hadoop internals sometimes push a newline into stdin while
+     * starting up, which would cause the first {@code Scanner.nextLine()}
+     * call to return an empty string immediately.
+     */
+    private void drainStdin() {
+        try {
+            int available = System.in.available();
+            if (available > 0) {
+                System.in.skip(available);
+            }
+        } catch (IOException e) {
+            LOG.warn("Could not drain stdin: {}", e.getMessage());
+        }
     }
 
     private void shutdown() {

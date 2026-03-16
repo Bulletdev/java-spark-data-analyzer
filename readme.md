@@ -77,6 +77,14 @@ src/main/java/com/dataanalyzer/
 
 ## Como executar
 
+### Script (recomendado)
+
+```bash
+./run.sh
+```
+
+Compila o projeto e executa em seguida, já com todas as flags JVM necessárias para o Spark 3.x.
+
 ### Com Maven (modo desenvolvimento)
 
 ```bash
