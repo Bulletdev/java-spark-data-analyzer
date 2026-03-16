@@ -1,2 +1,28 @@
-# Project exclude paths
+# Build
 /target/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.classpath
+*.project
+.settings/
+
+# Spark
+spark-warehouse/
+derby.log
+metastore_db/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+codacyissues.md
+PLANO_MELHORIA.md

@@ -1,4 +1,4 @@
-# 🕵️ Java Spark Data Analyzer
+# Java Spark Data Analyzer
 
 <div align="center">
 
@@ -6,156 +6,173 @@
 ![Apache Spark](https://img.shields.io/badge/Apache%20Spark-3.4.1-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-**Um aplicativo Java de análise de dados com Apache Spark que compete diretamente com soluções em Python.**
-
 </div>
- 
+
+Ferramenta CLI interativa para análise exploratória de dados utilizando **Apache Spark 3.4** e **Java 11**.
+
+Carregue arquivos CSV, explore schemas, aplique filtros e transformações, gere agregações e exporte os resultados — tudo sem escrever uma linha de código.
+
 ---
 
-## ✨ Principais Funcionalidades
+## Funcionalidades
 
-- 📊 **Carregamento intuitivo de dados** - Suporte para CSV com diversas opções de configuração
-- 🔍 **Visualização interativa** - Exibição de schemas, amostras e estatísticas descritivas
-- 🔄 **Transformações poderosas** - Seleção de colunas, criação de novas colunas, renomeação e ordenação
-- 🔎 **Filtros avançados** - Aplicação de condições para filtrar dados com precisão
-- 📈 **Agregações flexíveis** - Funções como média, soma, mínimo, máximo e contagem
-- ⚙️ **Tratamento de dados** - Remoção eficiente de duplicatas e valores nulos
-- 💾 **Múltiplos formatos de exportação** - Salvamento em CSV, Parquet e JSON
+- Carregamento de CSV com inferência automática de schema
+- Visualização de schema, amostra e estatísticas descritivas (com contagem de nulos por coluna)
+- Filtros com operadores `=`, `>`, `<`, `>=`, `<=`, `!=`
+- Agregações (`avg`, `sum`, `min`, `max`, `count`) com `GROUP BY` opcional
+- Transformações: seleção de colunas, renomear, criar colunas via expressão SQL, ordenar, remover duplicatas e nulos
+- Exportação nos formatos **CSV**, **Parquet** e **JSON**
 
-## 📋 Requisitos
+---
 
-- Java 8 ou 11 (recomendado)
-- Java 17+ (requer configurações adicionais)
-- Apache Maven
-- Memória suficiente para processar seus conjuntos de dados
+## Arquitetura
 
-## ⚙️ Configurações por Versão do Java
-
-### Java 8 ou 11 (Recomendado)
-Java 8 ou 11 funcionam diretamente sem configurações adicionais.
-
-### Java 17+
-Para usar com Java 17 ou superior, é necessário adicionar as seguintes opções JVM:
-```bash
---add-opens=java.base/java.nio=ALL-UNNAMED
---add-opens=java.base/sun.nio.ch=ALL-UNNAMED
---add-opens=java.base/java.util=ALL-UNNAMED
---add-opens=java.base/java.lang.invoke=ALL-UNNAMED
---add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+```
+src/main/java/com/dataanalyzer/
+├── DataAnalyzer.java              Entry point — wires all components
+├── UserInterface.java             Interactive loop — holds DataFrame state
+├── config/
+│   └── SparkConfig.java           Reads application.properties
+├── session/
+│   └── SparkSessionManager.java   SparkSession lifecycle
+├── core/
+│   ├── DataLoader.java            CSV loading
+│   ├── DataTransformer.java       Stateless transformations
+│   ├── DataAggregator.java        Stateless aggregations
+│   ├── DataExporter.java          CSV / Parquet / JSON export
+│   ├── AggFunction.java           Aggregation function enum
+│   └── ExportFormat.java          Export format enum
+├── ui/
+│   ├── MenuRenderer.java          Renders all CLI menus
+│   └── InputReader.java           Typed input reading
+└── util/
+    ├── ProgressBar.java            Terminal progress bar
+    └── SchemaValidator.java        DataFrame schema helpers
 ```
 
-## 🔧 Instalação
+**Princípio central:** `DataTransformer` e `DataAggregator` são completamente stateless — recebem e retornam `Dataset<Row>`. O estado (DataFrame atual) é mantido apenas pela `UserInterface`.
 
-1. Clone o repositório:
+---
+
+## Requisitos
+
+| Componente | Versão mínima |
+|------------|--------------|
+| Java       | 11           |
+| Maven      | 3.8+         |
+
+> **Java 17+**: adicione as flags JVM abaixo ao executar o JAR:
+> ```
+> --add-opens java.base/sun.nio.ch=ALL-UNNAMED
+> --add-opens java.base/java.nio=ALL-UNNAMED
+> --add-opens java.base/java.lang=ALL-UNNAMED
+> --add-opens java.base/java.util=ALL-UNNAMED
+> ```
+
+---
+
+## Como executar
+
+### Com Maven (modo desenvolvimento)
+
 ```bash
-git clone https://github.com/bulletdev/java-spark-data-analyzer.git
-cd java-spark-data-analyzer
+mvn compile exec:java -Dexec.mainClass="com.dataanalyzer.DataAnalyzer"
 ```
 
-2. Compile o projeto:
-```bash
-mvn clean package
-```
-
-## ▶️ Execução
-
-### Usando Maven
+### Gerando o JAR executável
 
 ```bash
-# Para Java 8/11
-mvn exec:java -Dexec.mainClass="com.dataanalyzer.DataAnalyzer"
-
-# Para Java 17+
-mvn exec:java -Dexec.mainClass="com.dataanalyzer.DataAnalyzer" -Dexec.args="" \
--Dexec.cleanupDaemonThreads=false \
--Dexec.jvmArgs="--add-opens=java.base/java.nio=ALL-UNNAMED \
---add-opens=java.base/sun.nio.ch=ALL-UNNAMED \
---add-opens=java.base/java.util=ALL-UNNAMED \
---add-opens=java.base/java.lang.invoke=ALL-UNNAMED \
---add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
-```
-
-### Usando o JAR compilado
-
-```bash
-# Para Java 8/11
+mvn clean package -DskipTests
 java -jar target/java-spark-data-analyzer-1.0-SNAPSHOT-jar-with-dependencies.jar
-
-# Para Java 17+
-java --add-opens=java.base/java.nio=ALL-UNNAMED \
---add-opens=java.base/sun.nio.ch=ALL-UNNAMED \
---add-opens=java.base/java.util=ALL-UNNAMED \
---add-opens=java.base/java.lang.invoke=ALL-UNNAMED \
---add-opens=java.base/java.util.concurrent=ALL-UNNAMED \
--jar target/java-spark-data-analyzer-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
-## ❓ Solução de Problemas
+---
+
+## Como rodar os testes
+
+```bash
+# Executa todos os testes
+mvn test
+
+# Gera relatório de cobertura (target/site/jacoco/index.html)
+mvn verify
+```
+
+Os testes usam uma `SparkSession` real em modo local — não há mocks de Spark.
+
+---
+
+## Schema do arquivo de exemplo
+
+O arquivo `src/main/resources/dados_vendas.csv` contém dados de vendas de eletrônicos:
+
+| Coluna     | Tipo    | Descrição                     |
+|------------|---------|-------------------------------|
+| ID         | Integer | Identificador da venda        |
+| Data       | String  | Data da venda (YYYY-MM-DD)    |
+| Produto    | String  | Nome do produto               |
+| Categoria  | String  | Categoria do produto          |
+| Preco      | Double  | Preço unitário                |
+| Quantidade | Integer | Quantidade vendida            |
+| ClienteID  | Integer | Identificador do cliente      |
+| Regiao     | String  | Região geográfica             |
+| Vendedor   | String  | Nome do vendedor              |
+| Desconto   | Double  | Percentual de desconto        |
+
+---
+
+## Exemplo de uso
+
+```
+=================================
+       Java Data Analyzer
+=================================
+1. Carregar dados
+...
+Escolha (1-9): 1
+
+Caminho do CSV (ou 'example' para dados de exemplo): example
+Dados carregados! Linhas: 100 | Colunas: 10
+
+Escolha (1-9): 6
+Coluna para agrupar (Enter para não agrupar): Regiao
+Coluna para agregar: Preco
+Função (1-5): 2   ← SUM
+
+--- Resultado da Agregação ---
++-------+----------+
+|Regiao |sum_Preco |
++-------+----------+
+|Norte  |45230.00  |
+|Sul    |67890.50  |
+...
+```
+
+---
+
+## Solução de Problemas
 
 ### Windows e Hadoop
 
-O Spark usa algumas funcionalidades do Hadoop que podem gerar avisos no Windows. Se encontrar avisos relacionados ao `winutils.exe` ou `HADOOP_HOME`, você pode:
+O Spark usa funcionalidades do Hadoop que podem gerar avisos no Windows. Se encontrar avisos relacionados ao `winutils.exe`:
 
-1. Ignorá-los (não afetam a funcionalidade básica do aplicativo)
-2. Configurar o ambiente Hadoop para Windows:
-    - Baixe o [winutils.exe](https://github.com/cdarlint/winutils)
-    - Crie uma pasta `C:\hadoop\bin` e coloque o arquivo lá
-    - Configure a variável de ambiente `HADOOP_HOME=C:\hadoop`
-    - Adicione `%HADOOP_HOME%\bin` ao PATH
-
-### Aviso de "illegal reflective access"
-
-Este aviso pode aparecer ao usar Java 11. É normal e não afeta o funcionamento do aplicativo.
-
-## 📊 Dados de Exemplo
-
-O projeto inclui um arquivo de exemplo `dados_vendas.csv` com dados fictícios de vendas de produtos eletrônicos para testar as funcionalidades do aplicativo. Este arquivo contém os seguintes campos:
-
-| Campo | Descrição |
-|-------|-----------|
-| ID | Identificador único da venda |
-| Data | Data da venda (formato YYYY-MM-DD) |
-| Produto | Nome do produto vendido |
-| Categoria | Categoria do produto |
-| Preco | Preço unitário do produto |
-| Quantidade | Quantidade vendida |
-| ClienteID | Identificador do cliente |
-| Regiao | Região geográfica da venda |
-| Vendedor | Nome do vendedor |
-| Desconto | Percentual de desconto aplicado (decimal) |
-
-## 📝 Uso Básico
-
-Ao iniciar o aplicativo, você verá um menu interativo:
-
-1. **Carregue os dados** usando a opção 1
-    - Digite o caminho para o CSV ou use "example" para o arquivo de exemplo
-    - Confirme se o arquivo tem cabeçalho (s/n)
-    - Especifique o delimitador (geralmente vírgula)
-
-2. **Explore os dados**:
-    - Opção 2: Ver a estrutura (schema) dos dados
-    - Opção 3: Ver uma amostra dos dados
-    - Opção 4: Ver estatísticas descritivas
-
-3. **Analise e transforme os dados**:
-    - Opção 5: Filtrar registros
-    - Opção 6: Agregar dados (ex: soma de vendas por região)
-    - Opção 7: Transformar dados (criar colunas, renomear, etc.)
-
-4. **Salve os resultados** usando a opção 8
-
-## 🤝 Contribuições
-
-Contribuições são bem-vindas! Se você encontrar bugs ou tiver sugestões de melhorias, abra uma issue ou envie um pull request.
-
-## 📜 Licença
-
-Este projeto está licenciado sob a Licença MIT - veja o arquivo LICENSE para detalhes.
+1. Ignore-os (não afetam a funcionalidade)
+2. Ou configure o ambiente: baixe o [winutils.exe](https://github.com/cdarlint/winutils), crie `C:\hadoop\bin`, coloque o arquivo lá e defina `HADOOP_HOME=C:\hadoop`
 
 ---
 
-<div align="center">
-  <p><strong>Por que Java para análise de dados?</strong> Desempenho superior, tipagem estática, multithreading robusto e integração perfeita com sistemas empresariais.</p>
-  <p><em>Java Spark Data Analyzer - A resposta Java para a análise de dados em Python.</em></p>
-</div>
+## Tecnologias
+
+| Tecnologia      | Versão | Uso                                |
+|-----------------|--------|------------------------------------|
+| Apache Spark    | 3.4.1  | Processamento distribuído de dados |
+| Scala (runtime) | 2.12   | Runtime do Spark                   |
+| JUnit Jupiter   | 5.10   | Testes de integração               |
+| JaCoCo          | 0.8.10 | Cobertura de testes                |
+| SLF4J           | —      | Logging estruturado (via Spark)    |
+
+---
+
+## Licença
+
+MIT
