@@ -1,15 +1,18 @@
 #!/bin/bash
 set -e
 
-JAR="target/java-spark-data-analyzer-1.0-SNAPSHOT-jar-with-dependencies.jar"
+CLASSES_DIR="target/classes"
 
-# Recompila só se o JAR não existe ou há fontes mais novos que ele
-if [ ! -f "$JAR" ] || find src -name "*.java" -newer "$JAR" | grep -q .; then
+# Recompila só se não houver classes ou houver fontes mais novos que elas
+if [ ! -d "$CLASSES_DIR" ] || find src/main/java -name "*.java" -newer "$CLASSES_DIR" | grep -q .; then
   echo "Compilando..."
-  mvn package -DskipTests -q
+  mvn compile -q
 else
   echo "Fontes sem alteração, pulando compilação."
 fi
+
+# Monta classpath com todas as dependências do projeto
+CP=$(mvn -q dependency:build-classpath -Dmdep.outputFile=/dev/stdout 2>/dev/null)
 
 java \
   --add-opens=java.base/java.lang=ALL-UNNAMED \
@@ -25,4 +28,5 @@ java \
   --add-opens=java.base/sun.nio.cs=ALL-UNNAMED \
   --add-opens=java.base/sun.security.action=ALL-UNNAMED \
   --add-opens=java.base/sun.util.calendar=ALL-UNNAMED \
-  -jar "$JAR"
+  -cp "target/classes:$CP" \
+  com.dataanalyzer.DataAnalyzer

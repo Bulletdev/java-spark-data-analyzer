@@ -83,13 +83,7 @@ src/main/java/com/dataanalyzer/
 ./run.sh
 ```
 
-Compila o projeto e executa em seguida, já com todas as flags JVM necessárias para o Spark 3.x.
-
-### Com Maven (modo desenvolvimento)
-
-```bash
-mvn compile exec:java -Dexec.mainClass="com.dataanalyzer.DataAnalyzer"
-```
+Compila apenas os fontes alterados (`mvn compile`), monta o classpath com as dependências do repositório local e executa diretamente via `java`, sem gerar fat JAR. Muito mais rápido para desenvolvimento.
 
 ### Gerando o JAR executável
 

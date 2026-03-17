@@ -1,6 +1,7 @@
 package com.dataanalyzer.session;
 
 import com.dataanalyzer.config.SparkConfig;
+import com.dataanalyzer.util.SparkProgressTracker;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +50,7 @@ public class SparkSessionManager {
             .getOrCreate();
 
         session.sparkContext().setLogLevel(config.getLogLevel());
+        session.sparkContext().addSparkListener(new SparkProgressTracker());
         LOG.info("SparkSession initialized. Version: {}",
             session.version());
         return session;
